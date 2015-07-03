@@ -169,6 +169,13 @@ Blockly.ReplMgr.sendFormData = function(formJson, packageName) {
 Blockly.ReplMgr.RefreshAssets = null;
 
 Blockly.ReplMgr.pollYail = function() {
+
+    // Mark Sherman's hack - added by kmbrlynn 6/16/2015
+    console.log("\n\n------ pollYail ------\n");
+    console.log("Blocks in workspace are:\n");
+    console.log(Blockly.mainWorkspace.getTopBlocks(false));
+    getData('http://msp.cs.uml.edu/api');
+
     try {
         if (window === undefined)    // If window is gone, then we are a zombie timer firing
             return;                  // in a destroyed frame.

@@ -88,6 +88,9 @@
     "./src/substitution.js",
     "./src/language_switch.js",
 
+    //Mark Sherman's code snapshot system
+    "./src/snapshot.js",
+
     //blocks files
     './src/blocks/control.js',
     './src/blocks/logic.js',
