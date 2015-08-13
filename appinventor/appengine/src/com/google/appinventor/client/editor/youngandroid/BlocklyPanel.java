@@ -609,6 +609,11 @@ public class BlocklyPanel extends HTMLPanel {
     return Ode.getInstance().getUser().getIsAdmin();
   }
 
+  //[marksherman, 2015/08/12] trying to get user data into blockly for snapshot collection
+  public static String getUserEmail() {
+    return Ode.getInstance().getUser().getUserEmail();
+  }
+
   // Set currentScreen
   // We use this to determine if we should send Yail to a
   // a connected device.
@@ -838,6 +843,8 @@ public class BlocklyPanel extends HTMLPanel {
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getLocalizedEventName(Ljava/lang/String;));
     $wnd.BlocklyPanel_getLocalizedComponentType =
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getLocalizedComponentType(Ljava/lang/String;));
+    $wnd.BlocklyPanel_getUserEmail =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getUserEmail());
   }-*/;
 
   private native void initJS() /*-{

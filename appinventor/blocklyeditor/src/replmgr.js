@@ -171,7 +171,7 @@ Blockly.ReplMgr.RefreshAssets = null;
 Blockly.ReplMgr.pollYail = function() {
 
     // Mark Sherman's hack - added by kmbrlynn 6/16/2015
-    Blockly.Snapshot.snapshot(Blockly.SaveFile.get());
+    Blockly.Snapshot.send();
 
     try {
         if (window === undefined)    // If window is gone, then we are a zombie timer firing
