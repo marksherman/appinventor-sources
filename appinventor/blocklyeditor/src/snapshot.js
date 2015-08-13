@@ -22,12 +22,18 @@ Blockly.Snapshot.send = function() {
 	//var dataUrl = 'http://msp.cs.uml.edu/api';
 	var dataUrl = 'http://localhost:8000';
 
-	var data = top.BlocklyPanel_getUserEmail();
+	//Blockly.mainWorkspace.getTopBlocks(false);
+
+	var data = [
+		top.BlocklyPanel_getUserEmail(),
+		myStringify(Blockly.mainWorkspace.getTopBlocks(false))
+		//Date()
+	];
 
 	var content = goog.json.serialize(
-		{	"jsonrpc": "2.0",
+	{	"jsonrpc": "2.0",
 		"method": "file.log",
-		"params": [data],
+		"params": data,
 		"id": ++idno }
 	);
 
