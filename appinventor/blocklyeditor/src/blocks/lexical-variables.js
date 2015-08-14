@@ -9,8 +9,6 @@
  */
 
 /**
- * [marksherman, 08/13/2015]
- *  + Re-enabled myStringify to aid in snapshot capture.
  * Lyn's History:
  *  * [lyn, written 11/16-17/13, added 07/01/14]
  *   + Added freeVariables, renameFree, and renameBound to local declarations
@@ -59,7 +57,7 @@
  * [lyn, 11/04/12] Created. Add global declarations. Work on local variable declaration statement.
  */
 
-
+/*
 // For debugging only
 function myStringify (obj) {
   var seen = [];
@@ -70,10 +68,10 @@ function myStringify (obj) {
        }
        seen.push(val);
    }
-   return val;
+   return val
    });
 }
-
+*/
 
 'use strict';
 
@@ -692,3 +690,6 @@ Blockly.Blocks['local_mutatorarg'] = {
     }
   }
 };
+
+
+
