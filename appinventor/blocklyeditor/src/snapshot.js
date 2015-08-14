@@ -26,7 +26,7 @@ Blockly.Snapshot.send = function() {
 
 	var data = [
 		top.BlocklyPanel_getUserEmail(),
-		myStringify(Blockly.mainWorkspace.getTopBlocks(false))
+		Blockly.SaveFile.get()
 		//Date()
 	];
 
