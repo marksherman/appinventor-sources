@@ -9,7 +9,33 @@
 goog.provide('Blockly.Snapshot');
 goog.require('goog.net.XhrIo');
 
+//var dataUrl = 'http://msp.cs.uml.edu/api';
+var dataUrl = 'http://localhost:8000';
+
+var xhr = new goog.net.XhrIo();
 var idno = 0;
+
+// Listen for completed RPC calls
+// "Complete" could be SUCCESS or ERROR
+goog.events.listen(xhr, goog.net.EventType.COMPLETE, function() {
+	// Put in here anything to run regardless of success/error
+});
+
+// Listen for Successfull RPC calls
+// Success event is fired AFTER complete event.
+goog.events.listen(xhr, goog.net.EventType.SUCCESS, function() {
+  var obj = this.getResponseJson();
+
+	console.log('%%%% getData result: ' + obj.result);
+	console.log(obj);
+});
+
+// Listen for Error-result RPC calls
+// Error event is fired AFTER complete event.
+goog.events.listen(xhr, goog.net.EventType.ERROR, function() {
+	var obj = this.getResponseJson();
+	console.log('%%%% getData resulted in error.');
+});
 
 /**
  * Prepares and Sends some snapshot data to a server
@@ -19,10 +45,6 @@ var idno = 0;
  * @param {string} snapshot data to send.
  */
 Blockly.Snapshot.send = function() {
-	//var dataUrl = 'http://msp.cs.uml.edu/api';
-	var dataUrl = 'http://localhost:8000';
-
-	//Blockly.mainWorkspace.getTopBlocks(false);
 
 	var metadata = {
 		userName: top.BlocklyPanel_getUserEmail(),
@@ -48,12 +70,5 @@ Blockly.Snapshot.send = function() {
 	console.log("Data:\n");
 	console.log(content);
 
-	goog.net.XhrIo.send(dataUrl, function(e) {
-		var xhr = e.target;
-		var obj = xhr.getResponseJson();
-
-		console.log('%%%% getData result: ' + obj.result);
-		console.log(obj);
-	},
-	"POST", content);
+	xhr.send(dataUrl, "POST", content);
 };
