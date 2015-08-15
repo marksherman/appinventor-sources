@@ -614,6 +614,23 @@ public class BlocklyPanel extends HTMLPanel {
     return Ode.getInstance().getUser().getUserEmail();
   }
 
+  public static String getSessionId(){
+    return Ode.getInstance().getSessionId();
+  }
+
+  public static String getProjectName(){
+    long id = Ode.getInstance().getCurrentYoungAndroidProjectId();
+    return Ode.getInstance().getProjectManager().getProject(id).getProjectName();
+  }
+
+  public static String getProjectId(){
+    return String.valueOf( Ode.getInstance().getCurrentYoungAndroidProjectId() );
+  }
+
+  public static String getScreenName(){
+    return currentForm;
+  }
+
   // Set currentScreen
   // We use this to determine if we should send Yail to a
   // a connected device.
@@ -845,6 +862,14 @@ public class BlocklyPanel extends HTMLPanel {
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getLocalizedComponentType(Ljava/lang/String;));
     $wnd.BlocklyPanel_getUserEmail =
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getUserEmail());
+    $wnd.BlocklyPanel_getSessionId =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getSessionId());
+    $wnd.BlocklyPanel_getProjectName =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getProjectName());
+    $wnd.BlocklyPanel_getProjectId =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getProjectId());
+    $wnd.BlocklyPanel_getScreenName =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getScreenName());
   }-*/;
 
   private native void initJS() /*-{

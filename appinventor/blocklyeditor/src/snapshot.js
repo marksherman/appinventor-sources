@@ -24,10 +24,17 @@ Blockly.Snapshot.send = function() {
 
 	//Blockly.mainWorkspace.getTopBlocks(false);
 
+	var metadata = {
+		userName: top.BlocklyPanel_getUserEmail(),
+		projectName: top.BlocklyPanel_getProjectName(),
+		projectId: top.BlocklyPanel_getProjectId(),
+		screenName: top.BlocklyPanel_getScreenName(),
+		sessionId: top.BlocklyPanel_getSessionId(),
+	};
+
 	var data = [
-		top.BlocklyPanel_getUserEmail(),
+		JSON.stringify(metadata),
 		Blockly.SaveFile.get()
-		//Date()
 	];
 
 	var content = goog.json.serialize(
