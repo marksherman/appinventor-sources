@@ -39,7 +39,6 @@ goog.events.listen(xhr, goog.net.EventType.ERROR, function() {
 
 /**
  * Prepares and Sends some snapshot data to a server
- * uses XhrIo's static send() method.
  *
  * @param {string} dataUrl The url to request.
  * @param {string} snapshot data to send.
