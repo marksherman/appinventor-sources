@@ -595,6 +595,7 @@ public class BlocklyPanel extends HTMLPanel {
       doResetYail(formName);
     formName = newFormName;
     blocklyWorkspaceChanged(formName);
+    //TODO marksherman snapshot form/project change here
   }
 
   public void startRepl(boolean alreadyRunning, boolean forEmulator, boolean forUsb) { // Start the Repl
@@ -630,6 +631,11 @@ public class BlocklyPanel extends HTMLPanel {
   public static String getScreenName(){
     return currentForm;
   }
+
+  public static String getFormContent(){
+    return "FORM!";
+  }
+  //end of marksherman snapshot helpers
 
   // Set currentScreen
   // We use this to determine if we should send Yail to a
@@ -870,6 +876,8 @@ public class BlocklyPanel extends HTMLPanel {
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getProjectId());
     $wnd.BlocklyPanel_getScreenName =
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getScreenName());
+    $wnd.BlocklyPanel_getFormContent =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getFormContent());
   }-*/;
 
   private native void initJS() /*-{

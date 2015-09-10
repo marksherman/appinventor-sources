@@ -171,7 +171,8 @@ Blockly.ReplMgr.RefreshAssets = null;
 Blockly.ReplMgr.pollYail = function() {
 
     // Mark Sherman's hack - added by kmbrlynn 6/16/2015
-    Blockly.Snapshot.send();
+    //Blockly.Snapshot.send();
+    //this might be better than blocklyeditor.js:149, as it aggregates transactions slightly
 
     try {
         if (window === undefined)    // If window is gone, then we are a zombie timer firing
