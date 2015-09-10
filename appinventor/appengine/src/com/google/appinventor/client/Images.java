@@ -426,6 +426,12 @@ public interface Images extends Resources {
   ImageResource web();
 
   /**
+   * Designer palette item: iSENSE component
+   */
+  @Source("com/google/appinventor/images/isense.png")
+  ImageResource iSENSEComponent();
+  
+  /**
    * Built in drawer item: control
    */
   @Source("com/google/appinventor/images/control.png")

@@ -5568,5 +5568,14 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("PostMedia")
   @Description("")
   String PostMediaMethods();
+  
+  // iSENSE.java
+  @DefaultMessage("Email/Password")
+  @Description("Text for iSENSE login type Email")
+  String emailiSENSELoginType();
+
+  @DefaultMessage("Contributor Key")
+  @Description("Text for iSENSE login type Contributor Key")
+  String contributorKeyiSENSELoginType();  
 
 }

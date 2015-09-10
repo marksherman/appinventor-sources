@@ -354,6 +354,8 @@ public class YaVersion {
   // - MEDIASTORE_COMPONENT_VERSION was incremented to 1
   // For YOUNG_ANDROID_VERSION 138: 
   // - FORM_COMPONENT_VERSION was incremented to 19.
+  // For YOUNG_ANDROID_VERSION 139: 
+  // - iSENSE component added
 
   public static final int YOUNG_ANDROID_VERSION = 139;
 
@@ -681,6 +683,9 @@ public class YaVersion {
   // - Callback parameters speed and heading were added to Flung. (for all sprites)
   public static final int IMAGESPRITE_COMPONENT_VERSION = 6;
 
+  // iSENSE
+  public static final int ISENSE_COMPONENT_VERSION = 1; 
+
   // For LABEL_COMPONENT_VERSION 2:
   // - The Alignment property was renamed to TextAlignment.
   // For LABEL_COMPONENT_VERSION 3:
@@ -978,6 +983,7 @@ public class YaVersion {
 
   // Splash Screen Values
   public static final int SPLASH_SURVEY = 1;
+
 
 
 }
