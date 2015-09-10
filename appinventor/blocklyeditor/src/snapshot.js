@@ -43,7 +43,7 @@ goog.events.listen(xhr, goog.net.EventType.ERROR, function() {
  * @param {string} dataUrl The url to request.
  * @param {string} snapshot data to send.
  */
-Blockly.Snapshot.send = function() {
+Blockly.Snapshot.send = function(eventType) {
 
 	var metadata = {
 		userName: top.BlocklyPanel_getUserEmail(),
@@ -51,21 +51,29 @@ Blockly.Snapshot.send = function() {
 		projectId: top.BlocklyPanel_getProjectId(),
 		screenName: top.BlocklyPanel_getScreenName(),
 		sessionId: top.BlocklyPanel_getSessionId(),
+    yaversion: top.BlocklyPanel_getYaVersion(),
+    languageVersion: top.BlocklyPanel_getBlocksLanguageVersion(),
+    eventType: eventType
 	};
+
+  var projectContents = {
+    blocks: Blockly.SaveFile.get(),
+    form: top.BlocklyPanel_getFormContent()
+  };
 
 	var data = [
 		JSON.stringify(metadata),
-		Blockly.SaveFile.get()
+		JSON.stringify(projectContents)
 	];
 
 	var content = goog.json.serialize(
 	{	"jsonrpc": "2.0",
 		"method": "file.log",
 		"params": data,
-		"id": ++idno }
+		"id": ++idno }    // dirty, i know -Mark
 	);
 
-	console.log("\n\n------ Snapshot! ------ " + Date() + "\n");
+	console.log("\n\n------ Snapshot! (" + eventType + ")------ " + Date() + "\n");
 	console.log("Data:\n");
 	console.log(content);
 
