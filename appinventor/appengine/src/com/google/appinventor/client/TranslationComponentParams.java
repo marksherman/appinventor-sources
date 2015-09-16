@@ -6,6 +6,8 @@
 package com.google.appinventor.client;
 
 import com.google.appinventor.client.output.OdeLog;
+import com.google.gwt.i18n.client.LocalizableResource.Description;
+import com.google.gwt.i18n.client.Messages.DefaultMessage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -193,6 +195,12 @@ public class TranslationComponentParams {
     map.put("languageToTranslateTo", MESSAGES.languageToTranslateToParams());
     map.put("textToTranslate", MESSAGES.textToTranslateParams());
     map.put("uri", MESSAGES.uriParams());
+    /*map.put("Email", MESSAGES.EmailParams()); 
+    map.put("Password", MESSAGES.PasswordParams()); 
+    map.put("ContributorKey", MESSAGES.ContributorKeyParams()); 
+    map.put("YourName", MESSAGES.YourNameParams()); 
+    map.put("LoginType", MESSAGES.LoginTypeParams()); */
+    
     return map;
   }
 }

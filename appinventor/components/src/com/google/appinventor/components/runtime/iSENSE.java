@@ -195,10 +195,10 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         });
       }
 
-      public void onFailure(final String message) {
+      public void onFailure(final String result) {
         handler.post(new Runnable() {
           public void run() {
-            UploadDataSetFailed(message);
+            UploadDataSetFailed();
           }
         });
       }
@@ -296,7 +296,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
       public void onFailure(final String result) {
         handler.post(new Runnable() {
           public void run() {
-            UploadPhotoToDataSetFailed(result);
+            UploadPhotoToDataSetFailed();
           }
         });
       }
@@ -314,23 +314,23 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
   }
 
   // Block Events
-  @SimpleEvent(description = "iSENSE Upload DataSet Succeeded")
+  @SimpleEvent(description = "iSENSE Upload Data Set Succeeded")
   public void UploadDataSetSucceeded(int result) {
     EventDispatcher.dispatchEvent(this, "UploadDataSetSucceeded", result);
   }
 
-  @SimpleEvent(description = "iSENSE Upload DataSet Failed")
-  public void UploadDataSetFailed(String result) {
-    EventDispatcher.dispatchEvent(this, "UploadDataSetFailed", result);
+  @SimpleEvent(description = "iSENSE Upload Data Set Failed")
+  public void UploadDataSetFailed() {
+    EventDispatcher.dispatchEvent(this, "UploadDataSetFailed");
   }
 
-  @SimpleEvent(description = "iSENSE Upload Photo To DataSet Succeeded")
+  @SimpleEvent(description = "iSENSE Upload Photo To Data Set Succeeded")
   public void UploadPhotoToDataSetSucceeded(int result) {
     EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetSucceeded", result);
   }
 
-  @SimpleEvent(description = "iSENSE Upload Photo To DataSet Failed")
-  public void UploadPhotoToDataSetFailed(String result) {
-    EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetFailed", result);
+  @SimpleEvent(description = "iSENSE Upload Photo To Data Set Failed")
+  public void UploadPhotoToDataSetFailed() {
+    EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetFailed");
   }
 }

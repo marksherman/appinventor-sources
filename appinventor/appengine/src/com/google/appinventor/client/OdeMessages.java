@@ -5101,6 +5101,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String ImageSpriteHelpStringComponentPallette();
 
+  @DefaultMessage("<p>This component allows an app to upload data to iSENSE. For more information, visit www.isenseproject.org. </p> ")
+  @Description("")
+  String iSENSEComponentHelpStringComponentPallette();
+  
   @DefaultMessage("A Label displays a piece of text, which is specified through the <code>Text</code> property.  Other properties, all of which can be set in the Designer or Blocks Editor, control the appearance and placement of the text.")
   @Description("")
   String LabelHelpStringComponentPallette();
@@ -5570,6 +5574,7 @@ public interface OdeMessages extends Messages {
   String PostMediaMethods();
   
   // iSENSE.java
+  
   @DefaultMessage("Email/Password")
   @Description("Text for iSENSE login type Email")
   String emailiSENSELoginType();
@@ -5577,5 +5582,85 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Contributor Key")
   @Description("Text for iSENSE login type Contributor Key")
   String contributorKeyiSENSELoginType();  
+  
+  @DefaultMessage("Contributor Key")
+  @Description("iSENSE Contributor Key")
+  String ContributorKeyProperties();
+  
+  @DefaultMessage("Email")
+  @Description("iSENSE Email")
+  String EmailProperties();
 
+  @DefaultMessage("Login Type")
+  @Description("iSENSE Login Type")
+  String LoginTypeProperties();
+
+  @DefaultMessage("Password")
+  @Description("iSENSE Password")
+  String PasswordProperties();
+
+  @DefaultMessage("ProjectID")
+  @Description("iSENSE ProjectID")
+  String ProjectIDProperties();
+
+  @DefaultMessage("Your Name")
+  @Description("iSENSE Your Name")
+  String YourNameProperties(); 
+  
+  @DefaultMessage("Upload Data Set Failed")
+  @Description("iSENSE Upload Data Set Failed")
+  String UploadDataSetFailedEvents();
+  
+  @DefaultMessage("Upload Data Set Succeeded")
+  @Description("iSENSE Upload Data Set Succeeded")
+  String UploadDataSetSucceededEvents();
+  
+  @DefaultMessage("Upload Photo to Data Set Failed")
+  @Description("iSENSE Upload Photo to Data Set Succeeded")
+  String UploadPhotoToDataSetFailedEvents();
+  
+  @DefaultMessage("Upload Photo to Data Set Succeeded")
+  @Description("iSENSE Upload Photo to Data Set Succeeded")
+  String UploadPhotoToDataSetSucceededEvents();
+  
+  @DefaultMessage("GetDataSetsByField")
+  @Description("Get the Data Sets for the current project")
+  String GetDataSetsByFieldMethods();
+
+  @DefaultMessage("GetTime")
+  @Description("Gets the current time. It is formatted correctly for iSENSE")
+  String GetTimeMethods();
+
+  @DefaultMessage("logcat")
+  @Description("logcat")
+  String LogToCatMethods();
+
+  @DefaultMessage("UploadDataSet")
+  @Description("Upload Data Set to iSENSE")
+  String UploadDataSetMethods();
+
+  @DefaultMessage("UploadPhotoToDataSet")
+  @Description("Uploads a photo to a dataset")
+  String UploadPhotoToDataSetMethods(); 
+  
+/*  @DefaultMessage("Email")
+  @Description("")
+  String EmailParams();
+  
+  @DefaultMessage("Password")
+  @Description("")
+  String PasswordParams();
+  
+  @DefaultMessage("ContributorKey")
+  @Description("")
+  String ContributorKeyParams();
+  
+  @DefaultMessage("YourName")
+  @Description("")
+  String YourNameParams();
+  
+  @DefaultMessage("LoginType")
+  @Description("")
+  String LoginTypeParams(); */ 
+  
 }

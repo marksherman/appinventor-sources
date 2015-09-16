@@ -1361,6 +1361,11 @@ Blockly.Versioning.AllUpgradeMaps =
 
   }, // End ImageSprite upgraders
 
+  "iSENSE": {
+    // This is the initial version. Placeholder for future upgrades.
+    1: "noUpgrade"
+  }, // End iSENSE upgraders
+
   "Label": {
 
     // AI1: The Alignment property was renamed to TextAlignment.
