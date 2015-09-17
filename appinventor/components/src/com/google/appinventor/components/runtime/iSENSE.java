@@ -42,7 +42,8 @@ import edu.uml.cs.isense.objects.RProjectField;
                    iconName = "images/isense.png")
 @SimpleObject
 public class iSENSE extends AndroidNonvisibleComponent implements Component {
-  private UploadInfo uInfo;
+  //private UploadInfo uInfo;
+  private int ProjectID;
   private String Email;
   private String Password;
   private String ContributorKey;
@@ -57,20 +58,19 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
     LoginType(Component.iSENSE_LOGIN_TYPE_EMAIL + "");
     api = API.getInstance();
     handler = new Handler();
-    uInfo = new UploadInfo();
   }
 
   // Block Properties
   // ProjectID
   @SimpleProperty(description = "iSENSE Project ID", category = PropertyCategory.BEHAVIOR)
   public int ProjectID() {
-    return uInfo.projectId;
+    return ProjectID;
   }
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
   @SimpleProperty
   public void ProjectID(int ProjectID) {
-    uInfo.projectId = ProjectID;
+    this.ProjectID = ProjectID;
   }
 
   // UserName
@@ -142,8 +142,9 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
     AsynchUtil.runAsynchronously(new Runnable() {
       public void run() {
         // Get fields from project
-        ArrayList<RProjectField> projectFields = api.getProjectFields(uInfo.projectId);
+        ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
         JSONObject jData = new JSONObject();
+        UploadInfo uInfo = new UploadInfo(); 
         for (int i = 0; i < Fields.size(); i++) {
           for (int j = 0; j < projectFields.size(); j++) {
             if (Fields.get(i + 1).equals(projectFields.get(j).name)) {
@@ -151,7 +152,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
                 String sdata = Data.get(i + 1).toString();
                 jData.put("" + projectFields.get(j).field_id, new JSONArray().put(sdata));
               } catch (JSONException e) {
-                UploadDataSetResult();
+                UploadDataSetResult(-1);
                 e.printStackTrace();
                 return;
               }
@@ -162,16 +163,16 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
           RPerson user = api.createSession(Email, Password);
           if (user == null) {
-            UploadDataSetResult();
+            UploadDataSetResult(-1);
             return;
           }
-          uInfo = api.uploadDataSet(uInfo.projectId, jData, DataSetName);
+          uInfo = api.uploadDataSet(ProjectID, jData, DataSetName);
           // login with contribution key
         } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
           Calendar cal = Calendar.getInstance();
           SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
           String date = " - " + sdf.format(cal.getTime()).toString();
-          uInfo = api.uploadDataSet(uInfo.projectId,
+          uInfo = api.uploadDataSet(ProjectID,
               jData,
               DataSetName + date,
               ContributorKey,
@@ -179,13 +180,13 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         }
         Log.i("iSENSE", "JSON Upload: " + jData.toString());
         Log.i("iSENSE", "Dataset ID: " + uInfo.dataSetId);
-        UploadDataSetResult();
+        UploadDataSetResult(uInfo.dataSetId);
       }
     });
   }
 
   // Upload Dataset Result (calls events in UI thread)
-  private void UploadDataSetResult() {
+  private void UploadDataSetResult(int dataSetId) {
     AsyncCallbackPair<Integer> myCallback = new AsyncCallbackPair<Integer>() {
       public void onSuccess(final Integer result) {
         handler.post(new Runnable() {
@@ -203,10 +204,10 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         });
       }
     };
-    if (uInfo.dataSetId == -1) {
-      myCallback.onFailure(uInfo.errorMessage);
+    if (dataSetId == -1) {
+      myCallback.onFailure("");
     } else {
-      myCallback.onSuccess(uInfo.dataSetId);
+      myCallback.onSuccess(dataSetId);
     }
   }
 
@@ -214,9 +215,9 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
   @SimpleFunction(description = "Get the Data Sets for the current project")
   public YailList GetDataSetsByField(final String Field) {
     String FieldID = null;
-    ArrayList<RDataSet> project_data = api.getDataSets(uInfo.projectId);
+    ArrayList<RDataSet> project_data = api.getDataSets(ProjectID);
     ArrayList<RDataSet> rdata = new ArrayList<RDataSet>();
-    ArrayList<RProjectField> projectFields = api.getProjectFields(uInfo.projectId);
+    ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
     ArrayList<String> fdata = new ArrayList<String>();
     for (RProjectField f : projectFields) {
       if (f.name.equals(Field)) {
@@ -255,8 +256,9 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
     AsynchUtil.runAsynchronously(new Runnable() {
       public void run() {
         java.io.File pic = new java.io.File(android.net.Uri.parse(Photo).getPath());
+        UploadInfo uInfo = new UploadInfo();
         if (!pic.exists()) {
-          UploadPhotoToDataSetResult();
+          UploadPhotoToDataSetResult(-1);
           return;
         }
         // if !exists return with error
@@ -264,7 +266,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
           RPerson user = api.createSession(Email, Password);
           if (user == null) {
-            UploadPhotoToDataSetResult();
+            UploadPhotoToDataSetResult(-1);
             return;
           }
           uInfo = api.uploadMedia(DataSetID, pic, API.TargetType.DATA_SET);
@@ -277,13 +279,13 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
               YourName);
         }
         Log.i("iSENSE", "MediaID: " + uInfo.mediaId);
-        UploadPhotoToDataSetResult();
+        UploadPhotoToDataSetResult(uInfo.mediaId);
       }
     });
   }
 
   // Upload Photo to Dataset Result (calls events in UI thread)
-  private void UploadPhotoToDataSetResult() {
+  private void UploadPhotoToDataSetResult(int mediaId) {
     AsyncCallbackPair<Integer> myCallback = new AsyncCallbackPair<Integer>() {
       public void onSuccess(final Integer result) {
         handler.post(new Runnable() {
@@ -301,10 +303,10 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         });
       }
     };
-    if (uInfo.mediaId == -1) {
-      myCallback.onFailure(uInfo.errorMessage);
+    if (mediaId == -1) {
+      myCallback.onFailure("");
     } else {
-      myCallback.onSuccess(uInfo.dataSetId);
+      myCallback.onSuccess(mediaId);
     }
   }
 
