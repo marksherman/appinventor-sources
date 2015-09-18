@@ -195,11 +195,6 @@ public class TranslationComponentParams {
     map.put("languageToTranslateTo", MESSAGES.languageToTranslateToParams());
     map.put("textToTranslate", MESSAGES.textToTranslateParams());
     map.put("uri", MESSAGES.uriParams());
-    /*map.put("Email", MESSAGES.EmailParams()); 
-    map.put("Password", MESSAGES.PasswordParams()); 
-    map.put("ContributorKey", MESSAGES.ContributorKeyParams()); 
-    map.put("YourName", MESSAGES.YourNameParams()); 
-    map.put("LoginType", MESSAGES.LoginTypeParams()); */
     
     return map;
   }

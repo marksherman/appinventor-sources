@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.os.Handler;
 import android.util.Log;
 
 import com.google.appinventor.components.annotations.DesignerComponent;
@@ -23,7 +22,6 @@ import com.google.appinventor.components.annotations.UsesPermissions;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
-import com.google.appinventor.components.runtime.util.AsyncCallbackPair;
 import com.google.appinventor.components.runtime.util.AsynchUtil;
 import com.google.appinventor.components.runtime.util.YailList;
 
@@ -33,31 +31,32 @@ import edu.uml.cs.isense.objects.RDataSet;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.objects.RProjectField;
 
-@UsesPermissions(permissionNames = "android.permission.INTERNET")
-@UsesLibraries(libraries = "isense.jar, httpmime.jar")
 @DesignerComponent(version = YaVersion.ISENSE_COMPONENT_VERSION,
                    description = "A component that provides a high-level interface to iSENSEProject.org",
                    category = ComponentCategory.SOCIAL,
                    nonVisible = true,
                    iconName = "images/isense.png")
 @SimpleObject
-public class iSENSE extends AndroidNonvisibleComponent implements Component {
+@UsesPermissions(permissionNames = "android.permission.INTERNET")
+@UsesLibraries(libraries = "isense.jar, httpmime.jar")
+
+public final class iSENSE extends AndroidNonvisibleComponent implements Component {
   //private UploadInfo uInfo;
-  private int ProjectID;
-  private String Email;
-  private String Password;
-  private String ContributorKey;
-  private String YourName;
-  private API api;
+  private int ProjectID = -1;
+  private int dataSetID = -1;
+  private int mediaID = -1;
   private int LoginType = -1;
-  private Handler handler;
+  private String Email = "";
+  private String Password = "";
+  private String ContributorKey = "";
+  private String YourName = "";
+  private final API api;
 
   public iSENSE(ComponentContainer container) {
     super(container.$form());
     Log.i("iSENSE", "Starting? " + container.toString());
     LoginType(Component.iSENSE_LOGIN_TYPE_EMAIL + "");
     api = API.getInstance();
-    handler = new Handler();
   }
 
   // Block Properties
@@ -68,7 +67,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
   }
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-  @SimpleProperty
+  @SimpleProperty(description = "iSENSE Project ID", category = PropertyCategory.BEHAVIOR)
   public void ProjectID(int ProjectID) {
     this.ProjectID = ProjectID;
   }
@@ -80,7 +79,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
   }
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-  @SimpleProperty
+  @SimpleProperty(description = "iSENSE Email", category = PropertyCategory.BEHAVIOR)
   public void Email(String Email) {
     this.Email = Email;
   }
@@ -92,7 +91,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
   }
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-  @SimpleProperty
+  @SimpleProperty(description = "iSENSE Password", category = PropertyCategory.BEHAVIOR)
   public void Password(String Password) {
     this.Password = Password;
   }
@@ -104,7 +103,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
   }
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-  @SimpleProperty
+  @SimpleProperty(description = "iSENSE Contributor Key", category = PropertyCategory.BEHAVIOR)
   public void ContributorKey(String ContributorKey) {
     this.ContributorKey = ContributorKey;
   }
@@ -116,7 +115,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
   }
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-  @SimpleProperty
+  @SimpleProperty(description = "iSENSE Your Name", category = PropertyCategory.BEHAVIOR)
   public void YourName(String YourName) {
     this.YourName = YourName;
   }
@@ -130,7 +129,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
 
   @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ISENSE_LOGIN_TYPE,
                     defaultValue = Component.iSENSE_LOGIN_TYPE_EMAIL + "")
-  @SimpleProperty
+  @SimpleProperty(description = "iSENSE Login Type", category = PropertyCategory.APPEARANCE)
   public void LoginType(String LoginType) {
     this.LoginType = Integer.parseInt(LoginType);
   }
@@ -152,7 +151,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
                 String sdata = Data.get(i + 1).toString();
                 jData.put("" + projectFields.get(j).field_id, new JSONArray().put(sdata));
               } catch (JSONException e) {
-                UploadDataSetResult(-1);
+                UploadDataSetFailed();
                 e.printStackTrace();
                 return;
               }
@@ -163,7 +162,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
           RPerson user = api.createSession(Email, Password);
           if (user == null) {
-            UploadDataSetResult(-1);
+            UploadDataSetFailed();
             return;
           }
           uInfo = api.uploadDataSet(ProjectID, jData, DataSetName);
@@ -178,37 +177,16 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
               ContributorKey,
               YourName);
         }
+        dataSetID = uInfo.dataSetId;
         Log.i("iSENSE", "JSON Upload: " + jData.toString());
-        Log.i("iSENSE", "Dataset ID: " + uInfo.dataSetId);
-        UploadDataSetResult(uInfo.dataSetId);
+        Log.i("iSENSE", "Dataset ID: " + dataSetID);
+        if (dataSetID == -1) {
+          UploadDataSetFailed();
+        } else {
+          UploadDataSetSucceeded(dataSetID); 
+        }
       }
     });
-  }
-
-  // Upload Dataset Result (calls events in UI thread)
-  private void UploadDataSetResult(int dataSetId) {
-    AsyncCallbackPair<Integer> myCallback = new AsyncCallbackPair<Integer>() {
-      public void onSuccess(final Integer result) {
-        handler.post(new Runnable() {
-          public void run() {
-            UploadDataSetSucceeded(result);
-          }
-        });
-      }
-
-      public void onFailure(final String result) {
-        handler.post(new Runnable() {
-          public void run() {
-            UploadDataSetFailed();
-          }
-        });
-      }
-    };
-    if (dataSetId == -1) {
-      myCallback.onFailure("");
-    } else {
-      myCallback.onSuccess(dataSetId);
-    }
   }
 
   // Get Dataset By Field
@@ -258,7 +236,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         java.io.File pic = new java.io.File(android.net.Uri.parse(Photo).getPath());
         UploadInfo uInfo = new UploadInfo();
         if (!pic.exists()) {
-          UploadPhotoToDataSetResult(-1);
+          UploadPhotoToDataSetFailed();
           return;
         }
         // if !exists return with error
@@ -266,7 +244,7 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
         if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
           RPerson user = api.createSession(Email, Password);
           if (user == null) {
-            UploadPhotoToDataSetResult(-1);
+            UploadPhotoToDataSetFailed(); 
             return;
           }
           uInfo = api.uploadMedia(DataSetID, pic, API.TargetType.DATA_SET);
@@ -278,36 +256,15 @@ public class iSENSE extends AndroidNonvisibleComponent implements Component {
               ContributorKey,
               YourName);
         }
-        Log.i("iSENSE", "MediaID: " + uInfo.mediaId);
-        UploadPhotoToDataSetResult(uInfo.mediaId);
+        mediaID = uInfo.mediaId;
+        Log.i("iSENSE", "MediaID: " + mediaID);
+        if (mediaID == -1) {
+          UploadPhotoToDataSetFailed();
+        } else {
+          UploadPhotoToDataSetSucceeded(mediaID);
+        }
       }
     });
-  }
-
-  // Upload Photo to Dataset Result (calls events in UI thread)
-  private void UploadPhotoToDataSetResult(int mediaId) {
-    AsyncCallbackPair<Integer> myCallback = new AsyncCallbackPair<Integer>() {
-      public void onSuccess(final Integer result) {
-        handler.post(new Runnable() {
-          public void run() {
-            UploadPhotoToDataSetSucceeded(result);
-          }
-        });
-      }
-
-      public void onFailure(final String result) {
-        handler.post(new Runnable() {
-          public void run() {
-            UploadPhotoToDataSetFailed();
-          }
-        });
-      }
-    };
-    if (mediaId == -1) {
-      myCallback.onFailure("");
-    } else {
-      myCallback.onSuccess(mediaId);
-    }
   }
 
   @SimpleFunction(description = "logcat")
