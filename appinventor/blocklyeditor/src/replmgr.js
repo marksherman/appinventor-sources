@@ -170,8 +170,8 @@ Blockly.ReplMgr.RefreshAssets = null;
 
 Blockly.ReplMgr.pollYail = function() {
 
-    // Mark Sherman's hack - added by kmbrlynn 6/16/2015
-    //Blockly.Snapshot.send();
+    // [msherman 2015-06-16] Capture and send a snapshot
+    //Blockly.Snapshot.send("pollYail");
     //this might be better than blocklyeditor.js:149, as it aggregates transactions slightly
 
     try {
