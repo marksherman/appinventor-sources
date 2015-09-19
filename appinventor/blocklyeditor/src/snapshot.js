@@ -58,7 +58,7 @@ Blockly.Snapshot.send = function(eventType) {
 
   var projectContents = {
     blocks: Blockly.SaveFile.get(),
-    form: top.BlocklyPanel_getFormContent()
+    form: top.ReplState.phoneState.formJson
   };
 
 	var data = [
