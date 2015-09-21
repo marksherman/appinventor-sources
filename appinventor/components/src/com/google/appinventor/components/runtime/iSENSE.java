@@ -42,14 +42,14 @@ import edu.uml.cs.isense.objects.RProjectField;
 
 public final class iSENSE extends AndroidNonvisibleComponent implements Component {
   //private UploadInfo uInfo;
-  private int ProjectID = -1;
+  private int ProjectID;
   private int dataSetID = -1;
   private int mediaID = -1;
-  private int LoginType = -1;
-  private String Email = "";
-  private String Password = "";
-  private String ContributorKey = "";
-  private String YourName = "";
+  private int LoginType;
+  private String Email;
+  private String Password;
+  private String ContributorKey;
+  private String YourName;
   private final API api;
 
   public iSENSE(ComponentContainer container) {
@@ -57,6 +57,11 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     Log.i("iSENSE", "Starting? " + container.toString());
     LoginType(Component.iSENSE_LOGIN_TYPE_EMAIL + "");
     api = API.getInstance();
+    ProjectID(-1); 
+    Email(""); 
+    Password(""); 
+    ContributorKey(""); 
+    YourName(""); 
   }
 
   // Block Properties

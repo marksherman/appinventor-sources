@@ -5162,7 +5162,7 @@ public interface OdeMessages extends Messages {
 
   @DefaultMessage("<p>This component allows an app to upload data to iSENSE. For more information, visit www.isenseproject.org. </p> ")
   @Description("")
-  String iSENSEComponentHelpStringComponentPallette();
+  String iSENSEHelpStringComponentPallette();
   
   @DefaultMessage("A Label displays a piece of text, which is specified through the <code>Text</code> property.  Other properties, all of which can be set in the Designer or Blocks Editor, control the appearance and placement of the text.")
   @Description("")

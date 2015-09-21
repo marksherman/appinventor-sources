@@ -226,8 +226,8 @@ public class TranslationDesignerPallete {
       value = MESSAGES.ImagePickerHelpStringComponentPallette();
     } else if (key.equals("ImageSprite-helpString")) {
       value = MESSAGES.ImageSpriteHelpStringComponentPallette();
-    } else if (key.equals("iSENSEComponent-helpString")) {
-      value = MESSAGES.iSENSEComponentHelpStringComponentPallette();
+    } else if (key.equals("iSENSE-helpString")) {
+      value = MESSAGES.iSENSEHelpStringComponentPallette();
     } else if (key.equals("Label-helpString")) {
       value = MESSAGES.LabelHelpStringComponentPallette();
     } else if (key.equals("ListPicker-helpString")) {
