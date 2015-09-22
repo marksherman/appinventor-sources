@@ -38,7 +38,7 @@ import edu.uml.cs.isense.objects.RProjectField;
                    iconName = "images/isense.png")
 @SimpleObject
 @UsesPermissions(permissionNames = "android.permission.INTERNET")
-@UsesLibraries(libraries = "isense.jar, httpmime.jar")
+@UsesLibraries(libraries = "isense.jar")
 
 public final class iSENSE extends AndroidNonvisibleComponent implements Component {
   //private UploadInfo uInfo;
