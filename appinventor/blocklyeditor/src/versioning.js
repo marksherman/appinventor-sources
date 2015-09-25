@@ -1933,9 +1933,6 @@ Blockly.Versioning.AllUpgradeMaps =
     // AI2: Added RequestFocus method
     5: "noUpgrade",
     	
-    // AI2: Moved HideKeyboard to Form
-    6: "noUpgrade"
-
   }, // End TextBox upgraders
 
   "Texting": {

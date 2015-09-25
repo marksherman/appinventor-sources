@@ -638,7 +638,7 @@ public class YaVersion {
   // - Screen.CompatibilityMode property morphed into the
   //   Sizing property
   // For FORM_COMPONENT_VERSION 19:
-  // - Moved HideKeyboard method from TextBox to Form
+  // - HideKeyboard method added. 
   public static final int FORM_COMPONENT_VERSION = 19;
 
   // For FUSIONTABLESCONTROL_COMPONENT_VERSION 2:
