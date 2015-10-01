@@ -79,6 +79,7 @@
     "./src/field_procedure.js",
     "./src/field_textblockinput.js",
     "./src/warningIndicator.js",
+    "./src/exportBlocksImage.js",
     "./src/flydown.js",
     "./src/field_flydown.js",
     "./src/field_parameter_flydown.js",
@@ -87,6 +88,10 @@
     "./src/nameSet.js",
     "./src/substitution.js",
     "./src/language_switch.js",
+
+    // backpack files
+    "./src/backpack.js",
+    "./src/backpackFlyout.js",
 
     //Mark Sherman's code snapshot system
     "./src/snapshot.js",
