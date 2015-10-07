@@ -25,12 +25,12 @@ goog.events.listen(xhr, goog.net.EventType.COMPLETE, function() {
 
 // Listen for Successfull RPC calls
 // Success event is fired AFTER complete event.
-goog.events.listen(xhr, goog.net.EventType.SUCCESS, function() {
+var xhrSuccess = function() {
   var obj = this.getResponseJson();
-
+  xhrPool.releaseObject(this);
 	console.log('%%%% getData result: ' + obj.result);
 	console.log(obj);
-});
+};
 
 // Listen for Error-result RPC calls
 // Error event is fired AFTER complete event.
@@ -79,5 +79,10 @@ Blockly.Snapshot.send = function(eventType) {
 	console.log("Data:\n");
 	console.log(content);
 
-	xhrPool.getObject().send(dataUrl, "POST", content);
+	xhrPool.getObject(
+    function(xhrObject)
+    {
+      goog.events.listen(xhrObject, goog.net.EventType.SUCCESS, xhrSuccess);
+      xhrObject.send(dataUrl, "POST", content);
+    });
 };
