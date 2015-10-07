@@ -19,9 +19,13 @@ var idno = 0;
 
 // Listen for completed RPC calls
 // "Complete" could be SUCCESS or ERROR
-goog.events.listen(xhr, goog.net.EventType.COMPLETE, function() {
+// "Complete" is called before success or error
+var xhrComplete = function()
+{
 	// Put in here anything to run regardless of success/error
-});
+  console.log('%%%% getData COMPLETE');
+
+};
 
 // Listen for Successfull RPC calls
 // Success event is fired AFTER complete event.
@@ -34,10 +38,10 @@ var xhrSuccess = function() {
 
 // Listen for Error-result RPC calls
 // Error event is fired AFTER complete event.
-goog.events.listen(xhr, goog.net.EventType.ERROR, function() {
-	var obj = this.getResponseJson();
+var xhrError = function() {
+  xhrPool.releaseObject(this);
 	console.log('%%%% getData resulted in error.');
-});
+};
 
 /**
  * Prepares and Sends some snapshot data to a server
@@ -75,7 +79,7 @@ Blockly.Snapshot.send = function(eventType) {
 		"id": ++idno }    // dirty, i know -Mark
 	);
 
-	console.log("\n\n------ Snapshot! (" + eventType + ")------ " + Date() + "\n");
+	console.log("\n\n------ Snapshot! (" + eventType + ")------ " + new Date() + "\n");
 	console.log("Data:\n");
 	console.log(content);
 
@@ -83,6 +87,8 @@ Blockly.Snapshot.send = function(eventType) {
     function(xhrObject)
     {
       goog.events.listen(xhrObject, goog.net.EventType.SUCCESS, xhrSuccess);
+      goog.events.listen(xhrObject, goog.net.EventType.COMPLETE, xhrComplete);
+      goog.events.listen(xhrObject, goog.net.EventType.ERROR, xhrError);
       xhrObject.send(dataUrl, "POST", content);
     });
 };
