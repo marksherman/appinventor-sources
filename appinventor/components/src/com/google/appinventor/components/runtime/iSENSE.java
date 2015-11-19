@@ -197,32 +197,8 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   // Get Dataset By Field
   @SimpleFunction(description = "Get the Data Sets for the current project")
   public YailList GetDataSetsByField(final String Field) {
-    String FieldID = null;
-    ArrayList<RDataSet> project_data = api.getDataSets(ProjectID);
-    ArrayList<RDataSet> rdata = new ArrayList<RDataSet>();
-    ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
-    ArrayList<String> fdata = new ArrayList<String>();
-    for (RProjectField f : projectFields) {
-      if (f.name.equals(Field)) {
-        FieldID = f.field_id + "";
-      }
-    }
-    for (RDataSet r : project_data) {
-      rdata.add(api.getDataSet(r.ds_id));
-    }
-    for (RDataSet r : rdata) {
-      try {
-        Log.i("iSENSE", "fdata:" + r.data.getString(FieldID));
-        JSONArray jadata = new JSONArray();
-        jadata = r.data.getJSONArray(FieldID);
-        for (int i = 0; i < jadata.length(); i++) {
-          fdata.add(jadata.getString(i));
-        }
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
-    }
-    return YailList.makeList(fdata);
+    ArrayList<String> result = api.getDataSetsByField(ProjectID, Field);
+    return YailList.makeList(result); 
   }
 
   // Get Time (formatted for iSENSE Upload)
