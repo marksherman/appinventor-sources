@@ -13,14 +13,14 @@ goog.require('goog.net.XhrIoPool');
 //var dataUrl = 'http://msp.cs.uml.edu/api';
 var dataUrl = 'http://localhost:8000';
 
-var xhr = new goog.net.XhrIo();
-var xhrPool = new goog.net.XhrIoPool(); //defaults to max instances = 10
+var ss_xhr = new goog.net.XhrIo();
+var ss_xhrPool = new goog.net.XhrIoPool(); //defaults to max instances = 10
 var idno = 0;
 
 // Listen for completed RPC calls
 // "Complete" could be SUCCESS or ERROR
 // "Complete" is called before success or error
-var xhrComplete = function()
+var ss_xhrComplete = function()
 {
 	// Put in here anything to run regardless of success/error
   console.log('%%%% getData COMPLETE');
@@ -29,17 +29,17 @@ var xhrComplete = function()
 
 // Listen for Successfull RPC calls
 // Success event is fired AFTER complete event.
-var xhrSuccess = function() {
+var ss_xhrSuccess = function() {
   var obj = this.getResponseJson();
-  xhrPool.releaseObject(this);
-	console.log('%%%% getData result: ' + obj.result);
-	console.log(obj);
+  ss_xhrPool.releaseObject(this);
+	console.log('%%%% getData Success - result: ' + obj.result);
+	//console.log(obj);
 };
 
 // Listen for Error-result RPC calls
 // Error event is fired AFTER complete event.
-var xhrError = function() {
-  xhrPool.releaseObject(this);
+var ss_xhrError = function() {
+  ss_xhrPool.releaseObject(this);
 	console.log('%%%% getData resulted in error.');
 };
 
@@ -80,15 +80,15 @@ Blockly.Snapshot.send = function(eventType) {
 	);
 
 	console.log("\n\n------ Snapshot! (" + eventType + ")------ " + new Date() + "\n");
-	console.log("Data:\n");
-	console.log(content);
+	//console.log("Data:\n");
+	//console.log(content);
 
-	xhrPool.getObject(
+	ss_xhrPool.getObject(
     function(xhrObject)
     {
-      goog.events.listen(xhrObject, goog.net.EventType.SUCCESS, xhrSuccess);
-      goog.events.listen(xhrObject, goog.net.EventType.COMPLETE, xhrComplete);
-      goog.events.listen(xhrObject, goog.net.EventType.ERROR, xhrError);
+      goog.events.listen(xhrObject, goog.net.EventType.SUCCESS, ss_xhrSuccess);
+      goog.events.listen(xhrObject, goog.net.EventType.COMPLETE, ss_xhrComplete);
+      goog.events.listen(xhrObject, goog.net.EventType.ERROR, ss_xhrError);
       xhrObject.send(dataUrl, "POST", content);
     });
 };
