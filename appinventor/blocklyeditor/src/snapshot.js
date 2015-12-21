@@ -51,7 +51,7 @@ var ss_xhrError = function() {
  */
 Blockly.Snapshot.send = function(eventType) {
 
-	var metadata = {
+	var projectData = {
 		userName: top.BlocklyPanel_getUserEmail(),
 		projectName: top.BlocklyPanel_getProjectName(),
 		projectId: top.BlocklyPanel_getProjectId(),
@@ -59,17 +59,13 @@ Blockly.Snapshot.send = function(eventType) {
 		sessionId: top.BlocklyPanel_getSessionId(),
     yaversion: top.BlocklyPanel_getYaVersion(),
     languageVersion: top.BlocklyPanel_getBlocksLanguageVersion(),
-    eventType: eventType
-	};
-
-  var projectContents = {
+    eventType: eventType,
     blocks: Blockly.SaveFile.get(),
     form: top.ReplState.phoneState.formJson
   };
 
 	var data = [
-		JSON.stringify(metadata),
-		JSON.stringify(projectContents)
+		JSON.stringify(projectData)
 	];
 
 	var content = goog.json.serialize(
