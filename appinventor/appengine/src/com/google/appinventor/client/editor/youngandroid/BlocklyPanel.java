@@ -641,7 +641,7 @@ public class BlocklyPanel extends HTMLPanel {
   }
 
   public static String getScreenName(){
-    return currentForm;
+    return Ode.getInstance().getCurrentYoungAndroidSourceNode().getFormName();
   }
 
   public static String getFormContent(){
