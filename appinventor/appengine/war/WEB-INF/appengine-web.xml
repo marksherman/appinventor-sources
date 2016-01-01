@@ -59,7 +59,7 @@
     <property name="use.gcs" value="true" />
 
     <!-- Name of gallery bucket in Google Cloud Store -->
-    <property name="gallery.bucket" value="gallery" />
+    <property name="gallery.bucket" value="ai2snapshot-gallery" />
     <!-- Whether or not to use the gallery -->
     <property name="use.gallery" value="true" />
 
