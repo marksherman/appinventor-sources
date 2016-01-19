@@ -910,6 +910,10 @@ public final class YoungAndroidFormUpgrader {
       // to upgrqde to version 2.
       srcCompVersion = 2;
     }
+    if (srcCompVersion < 3) {
+      // - Added background color & image
+      srcCompVersion = 3;
+    }
     return srcCompVersion;
   }
 
@@ -1205,6 +1209,10 @@ public final class YoungAndroidFormUpgrader {
       // The AlignHorizontal and AlignVertical properties were added. No blocks need to be modified
       // to upgrqde to version 2.
       srcCompVersion = 2;
+    }
+    if (srcCompVersion < 3) {
+      // - Added background color & image
+      srcCompVersion = 3;
     }
     return srcCompVersion;
   }
