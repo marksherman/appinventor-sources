@@ -360,11 +360,27 @@ public class YaVersion {
   // For YOUNG_ANDROID_VERSION 140:
   // - HORIZONTALARRANGEMENT_COMPONENT_VERSION was incremented to 3.
   // - VERTICALARRANGEMENT_COMPONENT_VERSION was incremented to 3
+  // For YOUNG_ANDROID_VERSION 141:
+  // - Reserved for FIRST Tech Challenge.
+  // For YOUNG_ANDROID_VERSION 142:
+  // - FORM_COMPONENT_VERSION was incremented to 19.
+  // For YOUNG_ANDROID_VERSION 143:
+  // - GyroscopeSensor component was added
+  // For YOUNG_ANDROID_VERSION 144:
+  // - Reserved for FIRST Tech Challenge.
+  // For YOUNG_ANDROID_VERSION 145:
+  // - Spelling of "obsfucate" was corrected to obfuscate and BLOCKS_LANGUAGE_VERSION incremented to 20
+  // For YOUNG_ANDROID_VERSION 146:
+  // - CAMERA_COMPONENT_VERSION was incremented to 3.
+  // For YOUNG_ANDROID_VERSION 147:
+  // - IMAGE_COMPONENT_VERSION was incremented to 2.
+  // For YOUNG_ANDROID_VERSION 148:
+  // - FIREBASE_COMPONENT_VERSION was incremented to 1
+  // For YOUNG_ANDROID_VERSION 149: 
+  // - ISENSE_COMPONENT_VERSION was incremented to 1
 
-  //public static final int YOUNG_ANDROID_VERSION = 140;
+  public static final int YOUNG_ANDROID_VERSION = 149;
 
-  // adding isense component
-  public static final int YOUNG_ANDROID_VERSION = 141;
   // ............................... Blocks Language Version Number ...............................
 
   // NOTE(lizlooney,user) - when the blocks language changes:
@@ -421,7 +437,9 @@ public class YaVersion {
   // For BLOCKS_LANGUAGE_VERSION 19:
   // The is-number block was modified to include dropdowns for base10, hex, and binary
   // The number-convert blocks was added
-  public static final int BLOCKS_LANGUAGE_VERSION = 19;
+  // For BLOCKS_LANGUAGE_VERSION 20:
+  // - Spelling of "Obsfucate" was corrected to Obfuscate in Text Block
+  public static final int BLOCKS_LANGUAGE_VERSION = 20;
 
   // ................................. Component Version Numbers ..................................
 
@@ -536,7 +554,9 @@ public class YaVersion {
 
   // For CAMERA_COMPONENT_VERSION 2:
   // - The UseFront property was added.
-   public static final int CAMERA_COMPONENT_VERSION = 2;
+  // For CAMERA_COMPONENT_VERSION 3:
+  // - The UseFront property was removed :-( .
+   public static final int CAMERA_COMPONENT_VERSION = 3;
 
   // For CANVAS_COMPONENT_VERSION 2:
   // - The LineWidth property was added.
@@ -657,13 +677,17 @@ public class YaVersion {
 
   public static final int GAMECLIENT_COMPONENT_VERSION = 1;
 
+  public static final int GYROSCOPESENSOR_COMPONENT_VERSION = 1;
+
   // For HORIZONTALARRANGEMENT_COMPONENT_VERSION 2:
   // - The AlignHorizontal property was added
   // - The AlignVertical property was added
   // - Added background color & image
   public static final int HORIZONTALARRANGEMENT_COMPONENT_VERSION = 3;
 
-  public static final int IMAGE_COMPONENT_VERSION = 1;
+  // For IMAGE_COMPONENT_VERSION 2:
+  // - The RotationAngle property was added.
+  public static final int IMAGE_COMPONENT_VERSION = 2;
 
   // For IMAGEPICKER_COMPONENT_VERSION 2:
   // - The Alignment property was renamed to TextAlignment.
@@ -883,6 +907,10 @@ public class YaVersion {
   // For TINYWEBDB_COMPONENT_VERSION 2:
   // - The TinyWebDB.ShowAlert method was removed. Notifier.ShowAlert should be used instead.
   public static final int TINYWEBDB_COMPONENT_VERSION = 2;
+
+  // // For FIREBASE_COMPONENT_VERSION 1:
+  // - FirebaseDB component introduced
+  public static final int FIREBASE_COMPONENT_VERSION = 1;
 
   // For TWITTER_COMPONENT_VERSION 2:
   // - The Authorize method and IsAuthorized event handler were added to support
