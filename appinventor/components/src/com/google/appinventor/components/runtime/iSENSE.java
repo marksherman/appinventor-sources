@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
+import android.os.Handler;
 
 import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
@@ -51,6 +52,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   private String ContributorKey;
   private String YourName;
   private final API api;
+  private final Handler androidUIHandler;
 
   public iSENSE(ComponentContainer container) {
     super(container.$form());
@@ -62,6 +64,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     Password(""); 
     ContributorKey(""); 
     YourName(""); 
+    androidUIHandler = new Handler();
   }
 
   // Block Properties
@@ -143,7 +146,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   // Upload Data Set
   @SimpleFunction(description = "Upload Data Set to iSENSE")
   public void UploadDataSet(final String DataSetName, final YailList Fields, final YailList Data) {
-    AsynchUtil.runAsynchronously(new Runnable() {
+    androidUIHandler.post(new Runnable() {
       public void run() {
         // Get fields from project
         ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
@@ -212,7 +215,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   // Upload Photo To Dataset
   @SimpleFunction(description = "Uploads a photo to a dataset")
   public void UploadPhotoToDataSet(final int DataSetID, final String Photo) {
-    AsynchUtil.runAsynchronously(new Runnable() {
+    androidUIHandler.post(new Runnable() {
       public void run() {
         java.io.File pic = new java.io.File(android.net.Uri.parse(Photo).getPath());
         UploadInfo uInfo = new UploadInfo();
@@ -255,8 +258,8 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
 
   // Block Events
   @SimpleEvent(description = "iSENSE Upload Data Set Succeeded")
-  public void UploadDataSetSucceeded(int result) {
-    EventDispatcher.dispatchEvent(this, "UploadDataSetSucceeded", result);
+  public void UploadDataSetSucceeded(int datasetId) {
+    EventDispatcher.dispatchEvent(this, "UploadDataSetSucceeded", datasetId);
   }
 
   @SimpleEvent(description = "iSENSE Upload Data Set Failed")
@@ -265,8 +268,8 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   }
 
   @SimpleEvent(description = "iSENSE Upload Photo To Data Set Succeeded")
-  public void UploadPhotoToDataSetSucceeded(int result) {
-    EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetSucceeded", result);
+  public void UploadPhotoToDataSetSucceeded(int datasetId) {
+    EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetSucceeded", datasetId);
   }
 
   @SimpleEvent(description = "iSENSE Upload Photo To Data Set Failed")

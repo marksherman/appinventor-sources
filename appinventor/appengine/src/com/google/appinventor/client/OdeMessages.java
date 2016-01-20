@@ -5769,5 +5769,4 @@ public interface OdeMessages extends Messages {
   @Description("")
   String useFrontDeprecated();
 
->>>>>>> c1ad82239f8dd62537718f39ac50bdefb79e121e
 }
