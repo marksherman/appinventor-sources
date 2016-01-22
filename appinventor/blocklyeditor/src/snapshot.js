@@ -10,8 +10,8 @@ goog.provide('Blockly.Snapshot');
 goog.require('goog.net.XhrIo');
 goog.require('goog.net.XhrIoPool');
 
-//var dataUrl = 'http://msp.cs.uml.edu/api';
-var dataUrl = 'http://localhost:8000';
+//var dataUrl = 'http://msp.cs.uml.edu/api/v1.0';
+var dataUrl = 'http://localhost:8000/v1.0';
 
 var ss_xhr = new goog.net.XhrIo();
 var ss_xhrPool = new goog.net.XhrIoPool(); //defaults to max instances = 10
