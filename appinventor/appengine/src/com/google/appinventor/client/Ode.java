@@ -1506,7 +1506,7 @@ public class Ode implements EntryPoint {
         @Override
           public void onSuccess(long [] projectIds) {
           if (projectIds.length == 0 && !templateLoadingFlag) {
-            createNoProjectsDialog(true);
+            //createNoProjectsDialog(true);
           }
         }
 
