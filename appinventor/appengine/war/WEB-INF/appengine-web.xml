@@ -69,7 +69,7 @@
 
     <!-- set to true if users need to accept a Terms of Service the first time
       they access App Inventor -->
-    <property name="require.tos" value="true" />
+    <property name="require.tos" value="false" />
 
     <!-- Flags that select authentication method
          set auth.usegoogle to true to use Google Accounts
