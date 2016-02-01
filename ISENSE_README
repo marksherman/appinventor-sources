@@ -5,8 +5,6 @@ Corresponding companion app: https://drive.google.com/folderview?id=0B-HKvYP2Ucq
 * Quick build/deploy instructions: *
 Build normally via ant.
 Companion should be located in appinventor/build/buildserver.
-Save the current webinfo xml (it's been changed from the default) 
-  appinventor/appengine/build/war/WEB-INF/appengine-web.xml
 Run "appcfg.sh -A isenseai update appinventor/appengine/build/war"
 
 * Buildserver instructions: *
