@@ -378,8 +378,10 @@ public class YaVersion {
   // - FIREBASE_COMPONENT_VERSION was incremented to 1
   // For YOUNG_ANDROID_VERSION 149: 
   // - ISENSE_COMPONENT_VERSION was incremented to 1
+  // For YOUNG_ANDROID_VERSION 150:
+  // - CLOCK_COMPONENT_VERSION was incremented to 3
 
-  public static final int YOUNG_ANDROID_VERSION = 149;
+  public static final int YOUNG_ANDROID_VERSION = 150;
 
   // ............................... Blocks Language Version Number ...............................
 
@@ -590,7 +592,8 @@ public class YaVersion {
 
   // For CLOCK_COMPONENT_VERSION 2:
   // - The pattern parameter was added to the FormatDate and FormatDateTime.
-  public static final int CLOCK_COMPONENT_VERSION = 2;
+  // - Add Duration Support
+  public static final int CLOCK_COMPONENT_VERSION = 3;
 
   // For CONTACTPICKER_COMPONENT_VERSION 2:
   // - The Alignment property was renamed to TextAlignment.
