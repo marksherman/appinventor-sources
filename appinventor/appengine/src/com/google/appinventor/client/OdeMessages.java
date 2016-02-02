@@ -563,6 +563,14 @@ public interface OdeMessages extends Messages {
   @Description("Information about the Companion")
   String companionInformation();
 
+  @DefaultMessage("Update the Companion")
+  @Description("Menu item to update the Companion to the latest version")
+  String companionUpdate();
+
+  @DefaultMessage("You must have a project open to update the Companion")
+  @Description("")
+  String companionUpdateMustHaveProject();
+
   @DefaultMessage("Show Splash Screen")
   @Description("Redisplay the Splash Screen")
   String showSplashMenuItem();
@@ -5745,5 +5753,11 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("The useFront property has been removed from your Camera Component")
   @Description("")
   String useFrontDeprecated();
+
+  @DefaultMessage("FirebaseDB is an experimental feature " +
+    "which may change in the future or break. Packaged Apps built with this component may not " +
+    "function into the indefinite future.")
+  @Description("")
+  String firebaseExperimentalWarning();
 
 }
