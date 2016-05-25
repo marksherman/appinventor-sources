@@ -46,29 +46,30 @@ import edu.uml.cs.isense.objects.RProjectField;
 @UsesPermissions(permissionNames = "android.permission.INTERNET,android.permission.ACCESS_NETWORK_STATE")
 @UsesLibraries(libraries = "isense.jar")
 
-class DataObject {
-  int projectId;
-  JSONObject data;
-  String dataName; 
-  String conKey;
-  String conName; 
+public final class iSENSE extends AndroidNonvisibleComponent implements Component {
 
-  DataObject(int projectId, JSONObject data, String dataName) {
-    this.projectId = projectId; 
-    this.data = data; 
-    this.dataName = dataName; 
+  class DataObject {
+    int projectId;
+    JSONObject data;
+    String dataName; 
+    String conKey;
+    String conName; 
+
+    DataObject(int projectId, JSONObject data, String dataName) {
+      this.projectId = projectId; 
+      this.data = data; 
+      this.dataName = dataName; 
+    }
+
+    DataObject(int projectId, JSONObject data, String dataName, String conKey, String conName) {
+      this.projectId = projectId; 
+      this.data = data;
+      this.dataName = dataName; 
+      this.conKey = conKey; 
+      this.conName = conName; 
+    }  
   }
 
-  DataObject(int projectId, JSONObject data, String dataName, String conKey, String conName) {
-    this.projectId = projectId; 
-    this.data = data;
-    this.dataName = dataName; 
-    this.conKey = conKey; 
-    this.conName = conName; 
-  }  
-}
-
-public final class iSENSE extends AndroidNonvisibleComponent implements Component {
   private int ProjectID;
   private int dataSetID = -1;
   private int mediaID = -1;
@@ -393,8 +394,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     public void UploadDataSetFailed() {
       EventDispatcher.dispatchEvent(this, "UploadDataSetFailed");
     }
-
-
 
   @SimpleEvent(description = "iSENSE Upload Photo To Data Set Succeeded")
     public void UploadPhotoToDataSetSucceeded(int datasetId) {
