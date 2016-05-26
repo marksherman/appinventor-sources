@@ -96,39 +96,38 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     pending = new LinkedList<DataObject>(); 
     androidUIHandler = new Handler();
     activity = container.$context(); 
+  } 
 
+  void tryUpload() {
     // Create background thread to upload data sets
     androidUIHandler.post(new Runnable() {
       public void run() {
-        while(true) {
+        while(pending.size() > 1) {
           // check for internet connectivity
           ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
           NetworkInfo mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE); 
           NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI); 
           if (mobi.isConnected() || wifi.isConnected()) { // we have data! 
-            // Any data to upload? 
-            if (pending.size() > 1) {
-              DataObject dob = pending.peek(); 
-              UploadInfo uInfo = new UploadInfo(); 
-              int dataSetID; 
-              // if no conKey, then email/password
-              if (dob.conKey == null) {
-                uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName); 
-              } else { // contributor key
-                Calendar cal = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
-                String date = " - " + sdf.format(cal.getTime()).toString();
-                uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName, dob.conKey, dob.conName); 
-              }
-              dataSetID = uInfo.dataSetId; 
-              Log.i("iSENSE", "JSON Upload: " + dob.data.toString()); 
-              Log.i("iSENSE", "Dataset ID: " + dataSetID); 
-              if (dataSetID == -1) {
-                UploadDataSetFailed(); 
-              } else { // else success! 
-                pending.remove(); 
-                UploadDataSetSucceeded(dataSetID); 
-              }
+            DataObject dob = pending.peek(); 
+            UploadInfo uInfo = new UploadInfo(); 
+            int dataSetID; 
+            // if no conKey, then email/password
+            if (dob.conKey == null) {
+              uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName); 
+            } else { // contributor key
+              Calendar cal = Calendar.getInstance();
+              SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
+              String date = " - " + sdf.format(cal.getTime()).toString();
+              uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName, dob.conKey, dob.conName); 
+            }
+            dataSetID = uInfo.dataSetId; 
+            Log.i("iSENSE", "JSON Upload: " + dob.data.toString()); 
+            Log.i("iSENSE", "Dataset ID: " + dataSetID); 
+            if (dataSetID == -1) {
+              UploadDataSetFailed(); 
+            } else { // else success! 
+              pending.remove(); 
+              UploadDataSetSucceeded(dataSetID); 
             }
           } else { // no data connection; sleep for a second
             try {
@@ -256,10 +255,8 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
         return;
       }
       pending.add(dob); 
+      tryUpload(); 
     }
-
-  // Background thread? 
-
 
   // Upload Data Set Immediately
   @SimpleFunction(description = "Upload Data Set immediately to iSENSE")
