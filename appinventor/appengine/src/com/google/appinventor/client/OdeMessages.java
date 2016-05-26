@@ -5191,6 +5191,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String GetTimeMethods();
 
+  @DefaultMessage("GetNumberPendingUploads")
+  @Description("")
+  String GetNumberPendingUploadsMethods(); 
+
   @DefaultMessage("logcat")
   @Description("")
   String LogToCatMethods();

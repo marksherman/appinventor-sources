@@ -48,7 +48,7 @@ import edu.uml.cs.isense.objects.RProjectField;
 
 public final class iSENSE extends AndroidNonvisibleComponent implements Component {
 
-  class DataObject {
+  private class DataObject {
     int projectId;
     JSONObject data;
     String dataName; 
@@ -102,13 +102,14 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     // Create background thread to upload data sets
     androidUIHandler.post(new Runnable() {
       public void run() {
-        while(pending.size() > 1) {
+        while(pending.size() > 0) {
           // check for internet connectivity
           ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
-          NetworkInfo mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE); 
+          //NetworkInfo mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE); 
           NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI); 
-          if (mobi.isConnected() || wifi.isConnected()) { // we have data! 
-            DataObject dob = pending.peek(); 
+          //if (mobi.isConnected() || wifi.isConnected()) { // we have data! 
+          if (wifi.isConnected()) {
+            DataObject dob = pending.remove(); 
             UploadInfo uInfo = new UploadInfo(); 
             int dataSetID; 
             // if no conKey, then email/password
@@ -126,7 +127,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
             if (dataSetID == -1) {
               UploadDataSetFailed(); 
             } else { // else success! 
-              pending.remove(); 
               UploadDataSetSucceeded(dataSetID); 
             }
           } else { // no data connection; sleep for a second
@@ -325,6 +325,12 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
       Calendar cal = Calendar.getInstance();
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
       return sdf.format(cal.getTime()).toString();
+    }
+
+  // Get Number of Pending Uploads (Advanced Feature)
+  @SimpleFunction(description = "Gets number of pending background uploads. Advanced feature.")
+    public int GetNumberPendingUploads() {
+      return pending.size(); 
     }
 
   // Upload Photo To Dataset
