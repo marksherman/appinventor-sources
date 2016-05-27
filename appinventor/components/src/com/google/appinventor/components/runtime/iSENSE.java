@@ -55,7 +55,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     JSONObject data;
     String dataName; 
     String conKey;
-    String conName; 
+    String conName;
 
     DataObject(int projectId, JSONObject data, String dataName) {
       this.projectId = projectId; 
@@ -73,26 +73,21 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   }
 
   // Private asynchronous task class that allows background uploads
-  private class UploadTask extends AsyncTask<DataObject, Boolean, Void> {
+  private class UploadTask extends AsyncTask<Void, Void, Integer> {
 
-    protected boolean onProgressUpdate() {
-      // test for wifi  
-      ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
-      return cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();  
-    }
-
-    protected Void doInBackground(DataObject... dobs) {
+    protected Integer doInBackground(Void... v) {
       // Sleep while we don't have a wifi connection
-      boolean wifi = onProgressUpdate(); 
+      ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
+      boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
       while (!wifi) {
         try { 
           Thread.sleep(1000); 
         } catch (InterruptedException e) {}
-        wifi = onProgressUpdate(); 
+        wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
       }
-      UploadInfo uInfo = new UploadInfo(); 
-      DataObject dob = dobs[0]; 
-      int dataSetID; 
+      UploadInfo uInfo = new UploadInfo();
+      DataObject dob = pending.peek();
+      int dataSetId;   
       // if no conKey, then email/password
       if (dob.conKey == null) {
         uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName); 
@@ -102,19 +97,20 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
         String date = " - " + sdf.format(cal.getTime()).toString();
         uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName, dob.conKey, dob.conName); 
       }
-      dataSetID = uInfo.dataSetId; 
+      dataSetId = uInfo.dataSetId; 
       Log.i("iSENSE", "JSON Upload: " + dob.data.toString()); 
-      Log.i("iSENSE", "Dataset ID: " + dataSetID); 
-      if (dataSetID == -1) {
-        UploadDataSetFailed(); 
-      } else { // else success! 
-        UploadDataSetSucceeded(dataSetID); 
-      }
-      return null; 
+      Log.i("iSENSE", "Dataset ID: " + dataSetId); 
+      return dataSetId; 
     }
 
-    protected void onPostExecute() {
-      pending.remove(); 
+    protected void onPostExecute(Integer result) {
+      DataObject dob = pending.remove();
+      Log.i("iSENSE", result + " wtf is happening i don't even know anymore");  
+      if (result == -1) {
+        UploadDataSetFailed(); 
+      } else {
+        UploadDataSetSucceeded(result); 
+      }
     }
 
   }
@@ -305,7 +301,7 @@ public void UploadDataSet(final String DataSetName, final YailList Fields, final
   }
   pending.add(dob); 
   //tryUpload(); 
-  new UploadTask().execute(dob); 
+  new UploadTask().execute(); 
 }
 
 // Upload Data Set Immediately
