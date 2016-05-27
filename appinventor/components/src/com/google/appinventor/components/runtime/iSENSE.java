@@ -51,25 +51,16 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
 
   // Private class that gives us a data structure with info for uploading a dataset
   class DataObject {
-    int projectId;
-    JSONObject data;
-    String dataName; 
-    String conKey;
-    String conName;
 
-    DataObject(int projectId, JSONObject data, String dataName) {
-      this.projectId = projectId; 
+    String name; 
+    YailList fields; 
+    YailList data; 
+
+    DataObject(String name, YailList fields, YailList data) {
+      this.name = name; 
+      this.fields = fields;
       this.data = data; 
-      this.dataName = dataName; 
     }
-
-    DataObject(int projectId, JSONObject data, String dataName, String conKey, String conName) {
-      this.projectId = projectId; 
-      this.data = data;
-      this.dataName = dataName; 
-      this.conKey = conKey; 
-      this.conName = conName; 
-    }  
   }
 
   // Private asynchronous task class that allows background uploads
@@ -85,27 +76,57 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
         } catch (InterruptedException e) {}
         wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
       }
-      UploadInfo uInfo = new UploadInfo();
-      DataObject dob = pending.peek();
-      int dataSetId;   
-      // if no conKey, then email/password
-      if (dob.conKey == null) {
-        uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName); 
-      } else { // contributor key
+
+      DataObject dob = pending.peek(); 
+      UploadInfo uInfo = new UploadInfo(); 
+
+      // Get fields from project
+      ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
+      JSONObject jData = new JSONObject();
+      for (int i = 0; i < dob.fields.size(); i++) {
+        for (int j = 0; j < projectFields.size(); j++) {
+          if (dob.fields.get(i + 1).equals(projectFields.get(j).name)) {
+            try {
+              String sdata = dob.data.get(i + 1).toString();
+              jData.put("" + projectFields.get(j).field_id, new JSONArray().put(sdata));
+            } catch (JSONException e) {
+              UploadDataSetFailed();
+              e.printStackTrace();
+              return -1;
+            }
+          }
+        }
+      }
+
+      // login with email
+      if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
+        RPerson user = api.createSession(Email, Password);
+        if (user == null) {
+          UploadDataSetFailed();
+          return -1;
+        }
+        uInfo = api.uploadDataSet(ProjectID, jData, dob.name); 
+
+        // login with contribution key
+      } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
         String date = " - " + sdf.format(cal.getTime()).toString();
-        uInfo = api.uploadDataSet(dob.projectId, dob.data, dob.dataName, dob.conKey, dob.conName); 
+        uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, YourName); 
+
+        // invalid login type
+      } else {
+        UploadDataSetFailed(); 
+        return -1;
       }
-      dataSetId = uInfo.dataSetId; 
-      Log.i("iSENSE", "JSON Upload: " + dob.data.toString()); 
+      int dataSetId = uInfo.dataSetId; 
+      Log.i("iSENSE", "JSON Upload: " + jData.toString()); 
       Log.i("iSENSE", "Dataset ID: " + dataSetId); 
       return dataSetId; 
-    }
+    } 
 
     protected void onPostExecute(Integer result) {
       DataObject dob = pending.remove();
-      Log.i("iSENSE", result + " wtf is happening i don't even know anymore");  
       if (result == -1) {
         UploadDataSetFailed(); 
       } else {
@@ -263,44 +284,8 @@ public void LoginType(String LoginType) {
 // Upload Data Set in Background
 @SimpleFunction(description = "Upload Data Set to iSENSE")
 public void UploadDataSet(final String DataSetName, final YailList Fields, final YailList Data) {
-  // Get fields from project
-  ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
-  JSONObject jData = new JSONObject();
-  DataObject dob; 
-  for (int i = 0; i < Fields.size(); i++) {
-    for (int j = 0; j < projectFields.size(); j++) {
-      if (Fields.get(i + 1).equals(projectFields.get(j).name)) {
-        try {
-          String sdata = Data.get(i + 1).toString();
-          jData.put("" + projectFields.get(j).field_id, new JSONArray().put(sdata));
-        } catch (JSONException e) {
-          UploadDataSetFailed();
-          e.printStackTrace();
-          return;
-        }
-      }
-    }
-  }
-  // login with email
-  if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
-    RPerson user = api.createSession(Email, Password);
-    if (user == null) {
-      UploadDataSetFailed();
-      return;
-    }
-    dob = new DataObject(ProjectID, jData, DataSetName); 
-    // login with contribution key
-  } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
-    Calendar cal = Calendar.getInstance();
-    SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
-    String date = " - " + sdf.format(cal.getTime()).toString();
-    dob = new DataObject(ProjectID, jData, DataSetName + date, ContributorKey, YourName); 
-  } else {
-    UploadDataSetFailed(); 
-    return;
-  }
-  pending.add(dob); 
-  //tryUpload(); 
+  DataObject dob = new DataObject(DataSetName, Fields, Data);
+  pending.add(dob);  
   new UploadTask().execute(); 
 }
 
