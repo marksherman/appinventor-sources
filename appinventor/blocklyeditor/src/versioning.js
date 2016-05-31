@@ -2069,6 +2069,9 @@ Blockly.Versioning.AllUpgradeMaps =
 
     // AI2: Added RequestFocus method
     5: "noUpgrade",
+
+    // AI2: TextBox HideKeyboard method moved to Form.java
+    6: "noUpgrade",
     	
   }, // End TextBox upgraders
 
