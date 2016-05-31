@@ -70,14 +70,22 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     protected Integer doInBackground(Void... v) {
       // Sleep while we don't have a wifi connection or a mobile connection
       ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
-      boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-      boolean mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
-      while (!(wifi||mobi)) {
+      //boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+      //boolean mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
+      //while (!(wifi||mobi)) {
+      NetworkInfo nInfo = cm.getActiveNetworkInfo(); 
+      if (nInfo == null) {
+        Log.i("iSENSE", "No network available!"); 
+        return -1; 
+      }
+      boolean data = nInfo.isConnected();
+      if (!data) { 
         try { 
           Thread.sleep(1000); 
         } catch (InterruptedException e) {}
-        wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
-        mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
+        //wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
+        //mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
+        data = nInfo.isConnected(); 
       }
 
       DataObject dob = pending.peek(); 
@@ -335,6 +343,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
           java.io.File pic = new java.io.File(android.net.Uri.parse(Photo).getPath());
           UploadInfo uInfo = new UploadInfo();
           if (!pic.exists()) {
+            Log.i("iSENSE", "picture does not exist!"); 
             UploadPhotoToDataSetFailed();
             return;
           }
