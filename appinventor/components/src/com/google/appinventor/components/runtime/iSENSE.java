@@ -68,14 +68,16 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
 
     // This is what actually runs in the background thread, so it's safe to block
     protected Integer doInBackground(Void... v) {
-      // Sleep while we don't have a wifi connection
+      // Sleep while we don't have a wifi connection or a mobile connection
       ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
-      boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
-      while (!wifi) {
+      boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+      boolean mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
+      while (!(wifi||mobi)) {
         try { 
           Thread.sleep(1000); 
         } catch (InterruptedException e) {}
         wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
+        mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
       }
 
       DataObject dob = pending.peek(); 
