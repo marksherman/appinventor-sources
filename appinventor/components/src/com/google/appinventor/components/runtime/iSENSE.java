@@ -31,6 +31,7 @@ import com.google.appinventor.components.common.PropertyTypeConstants;
 import com.google.appinventor.components.common.YaVersion;
 import com.google.appinventor.components.runtime.util.AsynchUtil;
 import com.google.appinventor.components.runtime.util.YailList;
+import com.google.appinventor.components.runtime.util.MediaUtil; 
 
 import edu.uml.cs.isense.api.API;
 import edu.uml.cs.isense.api.UploadInfo;
@@ -68,26 +69,29 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
 
     // This is what actually runs in the background thread, so it's safe to block
     protected Integer doInBackground(Void... v) {
+      
       // Sleep while we don't have a wifi connection or a mobile connection
       ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
-      //boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
-      //boolean mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
-      //while (!(wifi||mobi)) {
-      NetworkInfo nInfo = cm.getActiveNetworkInfo(); 
-      if (nInfo == null) {
-        Log.i("iSENSE", "No network available!"); 
-        return -1; 
-      }
-      boolean data = nInfo.isConnected();
-      if (!data) { 
-        try { 
+      NetworkInfo wInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI); 
+      NetworkInfo mInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+      
+      boolean wifi = wInfo.isConnected(); 
+      boolean mobi = false; 
+      
+      if (mInfo != null) mobi = mInfo.isConnected(); 
+      
+      while (!(wifi||mobi)) {
+        try {
+          Log.i("iSENSE", "No internet connection; sleeping for one second"); 
           Thread.sleep(1000); 
-        } catch (InterruptedException e) {}
-        //wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
-        //mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected();  
-        data = nInfo.isConnected(); 
-      }
+        } catch (InterruptedException e) {
+          Log.e("iSENSE", "Thread Interrupted!"); 
+        }
+        wifi = wInfo.isConnected(); 
+        if (mInfo != null) mobi = mInfo.isConnected(); 
+      } 
 
+      // Active internet connection detected; proceed with upload 
       DataObject dob = pending.peek(); 
       UploadInfo uInfo = new UploadInfo(); 
 
@@ -160,6 +164,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   private final API api;
   private final Handler androidUIHandler;
   private static Activity activity; 
+  private static Form form; 
 
   public iSENSE(ComponentContainer container) {
     super(container.$form());
@@ -174,6 +179,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     pending = new LinkedList<DataObject>(); 
     androidUIHandler = new Handler();
     activity = container.$context(); 
+    form = container.$form(); 
   } 
 
   // Block Properties
@@ -340,14 +346,20 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     public void UploadPhotoToDataSet(final int DataSetID, final String Photo) {
       androidUIHandler.post(new Runnable() {
         public void run() {
-          java.io.File pic = new java.io.File(android.net.Uri.parse(Photo).getPath());
+          // Validate photo
+          java.io.File pic = null;
+          try {
+            pic = MediaUtil.copyMediaToTempFile(form, Photo); 
+          } catch (java.io.IOException e) {
+            Log.e("iSENSE", "copyMediaToTempFile failed: " + e.getMessage()); 
+            UploadPhotoToDataSetFailed(); ; 
+          } 
           UploadInfo uInfo = new UploadInfo();
           if (!pic.exists()) {
             Log.i("iSENSE", "picture does not exist!"); 
             UploadPhotoToDataSetFailed();
             return;
           }
-          // if !exists return with error
           // login with email
           if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
             RPerson user = api.createSession(Email, Password);
