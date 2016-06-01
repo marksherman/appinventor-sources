@@ -72,14 +72,14 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
       
       // Sleep while we don't have a wifi connection or a mobile connection
       ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
-      NetworkInfo wInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI); 
-      NetworkInfo mInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-      
-      boolean wifi = wInfo.isConnected(); 
+
+      boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
       boolean mobi = false; 
       
-      if (mInfo != null) mobi = mInfo.isConnected(); 
-      
+      if (cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) {
+        mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected(); 
+      }
+
       while (!(wifi||mobi)) {
         try {
           Log.i("iSENSE", "No internet connection; sleeping for one second"); 
@@ -87,8 +87,10 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
         } catch (InterruptedException e) {
           Log.e("iSENSE", "Thread Interrupted!"); 
         }
-        wifi = wInfo.isConnected(); 
-        if (mInfo != null) mobi = mInfo.isConnected(); 
+        wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
+        if (cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) { 
+          mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected(); 
+        }
       } 
 
       // Active internet connection detected; proceed with upload 
@@ -343,23 +345,29 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
 
   // Upload Photo To Dataset
   @SimpleFunction(description = "Uploads a photo to a dataset")
-    public void UploadPhotoToDataSet(final int DataSetID, final String Photo) {
+    public void UploadPhotoToDataSet(final int DataSetID, final String photoPath) {
       androidUIHandler.post(new Runnable() {
         public void run() {
           // Validate photo
-          java.io.File pic = null;
-          try {
-            pic = MediaUtil.copyMediaToTempFile(form, Photo); 
-          } catch (java.io.IOException e) {
-            Log.e("iSENSE", "copyMediaToTempFile failed: " + e.getMessage()); 
-            UploadPhotoToDataSetFailed(); ; 
+          String[] pathtokens = photoPath.split("/"); 
+          java.io.File pic = null;  
+          if (pathtokens[0].equals("file:")) {
+            try {
+              pic = new java.io.File(new java.net.URL(photoPath).toURI()); 
+            } catch (Exception e) {
+              Log.e("iSENSE", "Malformed URL or URI"); 
+            }
+          } else {
+            pic = new java.io.File(photoPath); 
           } 
-          UploadInfo uInfo = new UploadInfo();
           if (!pic.exists()) {
             Log.i("iSENSE", "picture does not exist!"); 
             UploadPhotoToDataSetFailed();
             return;
           }
+          Log.i("iSENSE", "Trying to upload " + pic.getAbsolutePath()); 
+
+          UploadInfo uInfo = new UploadInfo(); 
           // login with email
           if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
             RPerson user = api.createSession(Email, Password);
@@ -368,7 +376,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
               return;
             }
             uInfo = api.uploadMedia(DataSetID, pic, API.TargetType.DATA_SET);
-            // login with contribution key
+            // login with contributor key
           } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
             uInfo = api.uploadMedia(DataSetID,
               pic,
@@ -414,8 +422,8 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     }
 
   @SimpleEvent(description = "iSENSE Upload Photo To Data Set Succeeded")
-    public void UploadPhotoToDataSetSucceeded(int datasetId) {
-      EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetSucceeded", datasetId);
+    public void UploadPhotoToDataSetSucceeded(int mediaId) {
+      EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetSucceeded", mediaId);
     }
 
   @SimpleEvent(description = "iSENSE Upload Photo To Data Set Failed")
