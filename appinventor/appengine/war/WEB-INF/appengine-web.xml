@@ -99,7 +99,7 @@
          Set set to 0 to disable checking for a MOTD.  If you do enable
          MOTD checking, make the interval long, because this check is
          resource expensive on App Engine -->
-    <property name="motd.check.interval.secs" value="100000" />
+    <property name="motd.check.interval.secs" value="0" />
 
     <!-- Set this to false if we should not send the Git build version with build requests.
          This is useful when testing new servers where we don't want to require the
