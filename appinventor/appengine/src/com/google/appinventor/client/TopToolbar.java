@@ -256,6 +256,7 @@ public class TopToolbar extends Composite {
     helpItems.add(new DropDownItem(WIDGET_NAME_SHOWSPLASH, MESSAGES.showSplashMenuItem(),
         new ShowSplashAction()));
 
+
     // Create the TopToolbar drop down menus.
     fileDropDown = new DropDownButton(WIDGET_NAME_PROJECT, MESSAGES.projectsTabName(),
         fileItems, false);
@@ -770,6 +771,11 @@ public class TopToolbar extends Composite {
         downloadinfo = "<br/>\n<a href=" + url + ">Download URL: " + url + "</a><br/>\n";
         downloadinfo += BlocklyPanel.getQRCode(url);
       }
+
+      /* Manually add companion link for cspathways */
+      String murl = "http://bit.ly/appviscomp";
+      downloadinfo = "<br/>\n<a href=" + murl + ">Download URL: " + murl + "</a><br/>\n";
+      downloadinfo += BlocklyPanel.getQRCode(murl);
 
       VerticalPanel DialogBoxContents = new VerticalPanel();
       HTML message = new HTML(
