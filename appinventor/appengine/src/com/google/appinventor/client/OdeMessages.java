@@ -4330,14 +4330,6 @@ public interface OdeMessages extends Messages {
   @Description("")
   String UploadDataSetSucceededEvents();
  
-  @DefaultMessage("Upload Data Set Immediately Failed")
-  @Description("")
-  String UploadDataSetImmediatelyFailedEvents();
-  
-  @DefaultMessage("Upload Data Set Immediately Succeeded")
-  @Description("")
-  String UploadDataSetImmediatelySucceededEvents();
- 
   @DefaultMessage("Upload Photo to Data Set Failed")
   @Description("")
   String UploadPhotoToDataSetFailedEvents();
@@ -5226,10 +5218,6 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("UploadDataSet")
   @Description("")
   String UploadDataSetMethods();
-
-  @DefaultMessage("UploadDataSetImmediately")
-  @Description("")
-  String UploadDataSetImmediatelyMethods();
 
   @DefaultMessage("UploadPhotoToDataSet")
   @Description("")

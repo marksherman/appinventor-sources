@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList; 
+import java.io.File; 
+import java.net.URL; 
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +18,7 @@ import android.content.Context;
 import android.net.ConnectivityManager; 
 import android.net.NetworkInfo; 
 import android.os.AsyncTask; 
+import android.net.Uri; 
 
 import com.google.appinventor.components.annotations.DesignerComponent;
 import com.google.appinventor.components.annotations.DesignerProperty;
@@ -49,110 +52,6 @@ import edu.uml.cs.isense.objects.RProjectField;
 @UsesLibraries(libraries = "isense.jar")
 
 public final class iSENSE extends AndroidNonvisibleComponent implements Component {
-
-  // Private class that gives us a data structure with info for uploading a dataset
-  class DataObject {
-
-    String name; 
-    YailList fields; 
-    YailList data; 
-
-    DataObject(String name, YailList fields, YailList data) {
-      this.name = name; 
-      this.fields = fields;
-      this.data = data; 
-    }
-  }
-
-  // Private asynchronous task class that allows background uploads
-  private class UploadTask extends AsyncTask<Void, Void, Integer> {
-
-    // This is what actually runs in the background thread, so it's safe to block
-    protected Integer doInBackground(Void... v) {
-      
-      // Sleep while we don't have a wifi connection or a mobile connection
-      ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
-
-      boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
-      boolean mobi = false; 
-      
-      if (cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) {
-        mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected(); 
-      }
-
-      while (!(wifi||mobi)) {
-        try {
-          Log.i("iSENSE", "No internet connection; sleeping for one second"); 
-          Thread.sleep(1000); 
-        } catch (InterruptedException e) {
-          Log.e("iSENSE", "Thread Interrupted!"); 
-        }
-        wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
-        if (cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) { 
-          mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected(); 
-        }
-      } 
-
-      // Active internet connection detected; proceed with upload 
-      DataObject dob = pending.peek(); 
-      UploadInfo uInfo = new UploadInfo(); 
-
-      // Get fields from project
-      ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
-      JSONObject jData = new JSONObject();
-      for (int i = 0; i < dob.fields.size(); i++) {
-        for (int j = 0; j < projectFields.size(); j++) {
-          if (dob.fields.get(i + 1).equals(projectFields.get(j).name)) {
-            try {
-              String sdata = dob.data.get(i + 1).toString();
-              jData.put("" + projectFields.get(j).field_id, new JSONArray().put(sdata));
-            } catch (JSONException e) {
-              UploadDataSetFailed();
-              e.printStackTrace();
-              return -1;
-            }
-          }
-        }
-      }
-
-      // login with email
-      if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
-        RPerson user = api.createSession(Email, Password);
-        if (user == null) {
-          UploadDataSetFailed();
-          return -1;
-        }
-        uInfo = api.uploadDataSet(ProjectID, jData, dob.name); 
-
-        // login with contributor key
-      } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
-        String date = " - " + sdf.format(cal.getTime()).toString();
-        uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, YourName); 
-
-        // invalid login type
-      } else {
-        UploadDataSetFailed(); 
-        return -1;
-      }
-      int dataSetId = uInfo.dataSetId; 
-      Log.i("iSENSE", "JSON Upload: " + jData.toString()); 
-      Log.i("iSENSE", "Dataset ID: " + dataSetId); 
-      return dataSetId; 
-    } 
-
-    // After background thread execution, UI handler runs this 
-    protected void onPostExecute(Integer result) {
-      DataObject dob = pending.remove();
-      if (result == -1) {
-        UploadDataSetFailed(); 
-      } else {
-        UploadDataSetSucceeded(result); 
-      }
-    }
-
-  }
 
   private int ProjectID;
   private int dataSetID = -1;
@@ -268,59 +167,109 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
       new UploadTask().execute(); 
     }
 
-  // Upload Data Set Immediately
-  @SimpleFunction(description = "Upload Data Set immediately to iSENSE")
-    public void UploadDataSetImmediately(final String DataSetName, final YailList Fields, final YailList Data) {
-      androidUIHandler.post(new Runnable() {
-        public void run() {
-          // Get fields from project
-          ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
-          JSONObject jData = new JSONObject();
-          UploadInfo uInfo = new UploadInfo(); 
-          for (int i = 0; i < Fields.size(); i++) {
-            for (int j = 0; j < projectFields.size(); j++) {
-              if (Fields.get(i + 1).equals(projectFields.get(j).name)) {
-                try {
-                  String sdata = Data.get(i + 1).toString();
-                  jData.put("" + projectFields.get(j).field_id, new JSONArray().put(sdata));
-                } catch (JSONException e) {
-                  UploadDataSetImmediatelyFailed();
-                  e.printStackTrace();
-                  return;
-                }
-              }
+  // Private class that gives us a data structure with info for uploading a dataset
+  class DataObject {
+
+    String name; 
+    YailList fields; 
+    YailList data; 
+
+    DataObject(String name, YailList fields, YailList data) {
+      this.name = name; 
+      this.fields = fields;
+      this.data = data; 
+    }
+  }
+
+  // Private asynchronous task class that allows background uploads
+  private class UploadTask extends AsyncTask<Void, Void, Integer> {
+
+    // This is what actually runs in the background thread, so it's safe to block
+    protected Integer doInBackground(Void... v) {
+      
+      // Sleep while we don't have a wifi connection or a mobile connection
+      ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
+
+      boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
+      boolean mobi = false; 
+      
+      if (cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) {
+        mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected(); 
+      }
+
+      while (!(wifi||mobi)) {
+        try {
+          Log.i("iSENSE", "No internet connection; sleeping for one second"); 
+          Thread.sleep(1000); 
+        } catch (InterruptedException e) {
+          Log.e("iSENSE", "Thread Interrupted!"); 
+        }
+        wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
+        if (cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) { 
+          mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected(); 
+        }
+      } 
+
+      // Active internet connection detected; proceed with upload 
+      DataObject dob = pending.peek(); 
+      UploadInfo uInfo = new UploadInfo(); 
+
+      // Get fields from project
+      ArrayList<RProjectField> projectFields = api.getProjectFields(ProjectID);
+      JSONObject jData = new JSONObject();
+      for (int i = 0; i < dob.fields.size(); i++) {
+        for (int j = 0; j < projectFields.size(); j++) {
+          if (dob.fields.get(i + 1).equals(projectFields.get(j).name)) {
+            try {
+              String sdata = dob.data.get(i + 1).toString();
+              jData.put("" + projectFields.get(j).field_id, new JSONArray().put(sdata));
+            } catch (JSONException e) {
+              UploadDataSetFailed();
+              e.printStackTrace();
+              return -1;
             }
-          }
-          // login with email
-          if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
-            RPerson user = api.createSession(Email, Password);
-            if (user == null) {
-              UploadDataSetImmediatelyFailed();
-              return;
-            }
-            uInfo = api.uploadDataSet(ProjectID, jData, DataSetName);
-            // login with contribution key
-          } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
-            String date = " - " + sdf.format(cal.getTime()).toString();
-            uInfo = api.uploadDataSet(ProjectID,
-                jData,
-                DataSetName + date,
-                ContributorKey,
-                YourName);
-          }
-          dataSetID = uInfo.dataSetId;
-          Log.i("iSENSE", "JSON Upload: " + jData.toString());
-          Log.i("iSENSE", "Dataset ID: " + dataSetID);
-          if (dataSetID == -1) {
-            UploadDataSetImmediatelyFailed();
-          } else {
-            UploadDataSetImmediatelySucceeded(dataSetID); 
           }
         }
-      });
+      }
+
+      // login with email
+      if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
+        RPerson user = api.createSession(Email, Password);
+        if (user == null) {
+          UploadDataSetFailed();
+          return -1;
+        }
+        uInfo = api.uploadDataSet(ProjectID, jData, dob.name); 
+
+        // login with contributor key
+      } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
+        String date = " - " + sdf.format(cal.getTime()).toString();
+        uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, YourName); 
+
+        // invalid login type
+      } else {
+        UploadDataSetFailed(); 
+        return -1;
+      }
+      int dataSetId = uInfo.dataSetId; 
+      Log.i("iSENSE", "JSON Upload: " + jData.toString()); 
+      Log.i("iSENSE", "Dataset ID: " + dataSetId); 
+      return dataSetId; 
+    } 
+
+    // After background thread execution, UI handler runs this 
+    protected void onPostExecute(Integer result) {
+      DataObject dob = pending.remove();
+      if (result == -1) {
+        UploadDataSetFailed(); 
+      } else {
+        UploadDataSetSucceeded(result); 
+      }
     }
+
+  }
 
   // Get Dataset By Field
   @SimpleFunction(description = "Get the Data Sets for the current project")
@@ -345,28 +294,29 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
 
   // Upload Photo To Dataset
   @SimpleFunction(description = "Uploads a photo to a dataset")
-    public void UploadPhotoToDataSet(final int DataSetID, final String photoPath) {
+    public void UploadPhotoToDataSet(final int DataSetID, final String Photo) {
       androidUIHandler.post(new Runnable() {
         public void run() {
           // Validate photo
-          String[] pathtokens = photoPath.split("/"); 
-          java.io.File pic = null;  
+          String path = ""; 
+          String[] pathtokens = Photo.split("/"); 
+          // If camera photo 
           if (pathtokens[0].equals("file:")) {
             try {
-              pic = new java.io.File(new java.net.URL(photoPath).toURI()); 
+              path = new File(new URL(Photo).toURI()).getAbsolutePath(); 
             } catch (Exception e) {
-              Log.e("iSENSE", "Malformed URL or URI"); 
+              Log.e("iSENSE", "Malformed URL or URI!"); 
             }
-          } else {
-            pic = new java.io.File(photoPath); 
+          } else { // Assets photo
+            path = "/sdcard/AppInventor/assets/" + Photo; 
           } 
+          File pic = new File(path); 
           if (!pic.exists()) {
-            Log.i("iSENSE", "picture does not exist!"); 
+            Log.e("iSENSE", "picture does not exist!"); 
             UploadPhotoToDataSetFailed();
             return;
           }
-          Log.i("iSENSE", "Trying to upload " + pic.getAbsolutePath()); 
-
+          Log.i("iSENSE", "Trying to upload: " + path); 
           UploadInfo uInfo = new UploadInfo(); 
           // login with email
           if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
@@ -380,7 +330,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
           } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
             uInfo = api.uploadMedia(DataSetID,
               pic,
-              API.TargetType.DATA_SET,
+              API.TargetType.PROJECT,
               ContributorKey,
               YourName);
           }
@@ -398,17 +348,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   @SimpleFunction(description = "logcat")
     public void LogToCat(String catify) {
       Log.i("iSENSE", catify);
-    }
-
-  // Block Events
-  @SimpleEvent(description = "iSENSE Immediate Upload Data Set Succeeded")
-    public void UploadDataSetImmediatelySucceeded(int datasetId) {
-      EventDispatcher.dispatchEvent(this, "UploadDataSetImmediatelySucceeded", datasetId);
-    }
-
-  @SimpleEvent(description = "iSENSE Immediate Upload Data Set Failed")
-    public void UploadDataSetImmediatelyFailed() {
-      EventDispatcher.dispatchEvent(this, "UploadDataSetImmediatelyFailed");
     }
 
   @SimpleEvent(description = "iSENSE Upload Data Set Succeeded")
