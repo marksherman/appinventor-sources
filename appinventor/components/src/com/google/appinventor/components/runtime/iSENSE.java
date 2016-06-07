@@ -44,7 +44,7 @@ import edu.uml.cs.isense.objects.RProjectField;
 
 @DesignerComponent(version = YaVersion.ISENSE_COMPONENT_VERSION,
     description = "A component that provides a high-level interface to iSENSEProject.org",
-    category = ComponentCategory.SOCIAL,
+    category = ComponentCategory.CONNECTIVITY,
     nonVisible = true,
     iconName = "images/isense.png")
 @SimpleObject
@@ -56,9 +56,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   private int ProjectID;
   private int dataSetID = -1;
   private int mediaID = -1;
-  private int LoginType;
-  private String Email;
-  private String Password;
   private String ContributorKey;
   private String YourName;
   private LinkedList<DataObject> pending; 
@@ -70,11 +67,8 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   public iSENSE(ComponentContainer container) {
     super(container.$form());
     Log.i("iSENSE", "Starting? " + container.toString());
-    LoginType(Component.iSENSE_LOGIN_TYPE_EMAIL + "");
     api = API.getInstance();
     ProjectID(-1); 
-    Email(""); 
-    Password(""); 
     ContributorKey(""); 
     YourName(""); 
     pending = new LinkedList<DataObject>(); 
@@ -94,30 +88,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     @SimpleProperty(description = "iSENSE Project ID", category = PropertyCategory.BEHAVIOR)
     public void ProjectID(int ProjectID) {
       this.ProjectID = ProjectID;
-    }
-
-  // UserName
-  @SimpleProperty(description = "iSENSE Email", category = PropertyCategory.BEHAVIOR)
-    public String Email() {
-      return Email;
-    }
-
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(description = "iSENSE Email", category = PropertyCategory.BEHAVIOR)
-    public void Email(String Email) {
-      this.Email = Email;
-    }
-
-  // Password
-  @SimpleProperty(description = "iSENSE Password", category = PropertyCategory.BEHAVIOR)
-    public String Password() {
-      return Password;
-    }
-
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(description = "iSENSE Password", category = PropertyCategory.BEHAVIOR)
-    public void Password(String Password) {
-      this.Password = Password;
     }
 
   // Contributor Key
@@ -142,20 +112,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     @SimpleProperty(description = "iSENSE Your Name", category = PropertyCategory.BEHAVIOR)
     public void YourName(String YourName) {
       this.YourName = YourName;
-    }
-
-  // Login Type
-  @SimpleProperty(category = PropertyCategory.APPEARANCE,
-      description = "This selects how you will login to iSENSEProject.org.  Either an email or a contributor key")
-    public int LoginType() {
-      return LoginType;
-    }
-
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_ISENSE_LOGIN_TYPE,
-      defaultValue = Component.iSENSE_LOGIN_TYPE_EMAIL + "")
-    @SimpleProperty(description = "iSENSE Login Type", category = PropertyCategory.APPEARANCE)
-    public void LoginType(String LoginType) {
-      this.LoginType = Integer.parseInt(LoginType);
     }
 
   // Block Functions
@@ -186,13 +142,13 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
 
     // This is what actually runs in the background thread, so it's safe to block
     protected Integer doInBackground(Void... v) {
-      
+
       // Sleep while we don't have a wifi connection or a mobile connection
       ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
 
       boolean wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected(); 
       boolean mobi = false; 
-      
+
       if (cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE) != null) {
         mobi = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected(); 
       }
@@ -232,27 +188,12 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
         }
       }
 
-      // login with email
-      if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
-        RPerson user = api.createSession(Email, Password);
-        if (user == null) {
-          UploadDataSetFailed();
-          return -1;
-        }
-        uInfo = api.uploadDataSet(ProjectID, jData, dob.name); 
+      // login with contributor key
+      Calendar cal = Calendar.getInstance();
+      SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
+      String date = " - " + sdf.format(cal.getTime()).toString();
+      uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, YourName); 
 
-        // login with contributor key
-      } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
-        String date = " - " + sdf.format(cal.getTime()).toString();
-        uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, YourName); 
-
-        // invalid login type
-      } else {
-        UploadDataSetFailed(); 
-        return -1;
-      }
       int dataSetId = uInfo.dataSetId; 
       Log.i("iSENSE", "JSON Upload: " + jData.toString()); 
       Log.i("iSENSE", "Dataset ID: " + dataSetId); 
@@ -293,6 +234,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     }
 
   // Upload Photo To Dataset
+  // Note that this function has never worked correctly and is still in development
   @SimpleFunction(description = "Uploads a photo to a dataset")
     public void UploadPhotoToDataSet(final int DataSetID, final String Photo) {
       androidUIHandler.post(new Runnable() {
@@ -318,22 +260,11 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
           }
           Log.i("iSENSE", "Trying to upload: " + path); 
           UploadInfo uInfo = new UploadInfo(); 
-          // login with email
-          if (LoginType == iSENSE_LOGIN_TYPE_EMAIL) {
-            RPerson user = api.createSession(Email, Password);
-            if (user == null) {
-              UploadPhotoToDataSetFailed(); 
-              return;
-            }
-            uInfo = api.uploadMedia(DataSetID, pic, API.TargetType.DATA_SET);
-            // login with contributor key
-          } else if (LoginType == iSENSE_LOGIN_TYPE_KEY) {
-            uInfo = api.uploadMedia(DataSetID,
+          uInfo = api.uploadMedia(DataSetID,
               pic,
               API.TargetType.PROJECT,
               ContributorKey,
               YourName);
-          }
           mediaID = uInfo.mediaId;
           Log.i("iSENSE", "MediaID: " + mediaID);
           if (mediaID == -1) {

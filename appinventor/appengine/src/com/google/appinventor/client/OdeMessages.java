@@ -3296,18 +3296,6 @@ public interface OdeMessages extends Messages {
   @Description("")
   String ContributorKeyProperties();
   
-  @DefaultMessage("Email")
-  @Description("")
-  String EmailProperties();
-
-  @DefaultMessage("Login Type")
-  @Description("")
-  String LoginTypeProperties();
-
-  @DefaultMessage("Password")
-  @Description("")
-  String PasswordProperties();
-
   @DefaultMessage("ProjectID")
   @Description("")
   String ProjectIDProperties();
@@ -5829,10 +5817,6 @@ public interface OdeMessages extends Messages {
   @Description("")
   String PostMediaMethods();
   
-  @DefaultMessage("Email/Password")
-  @Description("Text for iSENSE login type Email")
-  String emailiSENSELoginType();
-
   @DefaultMessage("Contributor Key")
   @Description("Text for iSENSE login type Contributor Key")
   String contributorKeyiSENSELoginType();  
