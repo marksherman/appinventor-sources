@@ -118,6 +118,11 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   // Upload Data Set in Background
   @SimpleFunction(description = "Upload Data Set to iSENSE")
     public void UploadDataSet(final String DataSetName, final YailList Fields, final YailList Data) {
+      // ensure that the lists are the same size 
+      if (Fields.size() != Data.size()) {
+        UploadDataSetFailed(); 
+      } 
+      // Create new "DataObject" and add to upload queue
       DataObject dob = new DataObject(DataSetName, Fields, Data);
       pending.add(dob);  
       new UploadTask().execute(); 
