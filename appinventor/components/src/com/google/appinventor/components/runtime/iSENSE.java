@@ -44,7 +44,7 @@ import edu.uml.cs.isense.objects.RProjectField;
 
 @DesignerComponent(version = YaVersion.ISENSE_COMPONENT_VERSION,
     description = "A component that provides a high-level interface to iSENSEProject.org",
-    category = ComponentCategory.CONNECTIVITY,
+    category = ComponentCategory.SOCIAL,
     nonVisible = true,
     iconName = "images/isense.png")
 @SimpleObject
@@ -57,7 +57,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   private int dataSetID = -1;
   private int mediaID = -1;
   private String ContributorKey;
-  private String YourName;
   private LinkedList<DataObject> pending; 
   private final API api;
   private final Handler androidUIHandler;
@@ -70,7 +69,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     api = API.getInstance();
     ProjectID(-1); 
     ContributorKey(""); 
-    YourName(""); 
     pending = new LinkedList<DataObject>(); 
     androidUIHandler = new Handler();
     activity = container.$context(); 
@@ -100,18 +98,6 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
     @SimpleProperty(description = "iSENSE Contributor Key", category = PropertyCategory.BEHAVIOR)
     public void ContributorKey(String ContributorKey) {
       this.ContributorKey = ContributorKey;
-    }
-
-  // Name
-  @SimpleProperty(description = "iSENSE Your Name", category = PropertyCategory.BEHAVIOR)
-    public String YourName() {
-      return YourName;
-    }
-
-  @DesignerProperty(editorType = PropertyTypeConstants.PROPERTY_TYPE_STRING, defaultValue = "")
-    @SimpleProperty(description = "iSENSE Your Name", category = PropertyCategory.BEHAVIOR)
-    public void YourName(String YourName) {
-      this.YourName = YourName;
     }
 
   // Block Functions
@@ -197,7 +183,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
       Calendar cal = Calendar.getInstance();
       SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
       String date = " - " + sdf.format(cal.getTime()).toString();
-      uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, YourName); 
+      uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, form.Title()); 
 
       int dataSetId = uInfo.dataSetId; 
       Log.i("iSENSE", "JSON Upload: " + jData.toString()); 
@@ -267,9 +253,9 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
           UploadInfo uInfo = new UploadInfo(); 
           uInfo = api.uploadMedia(DataSetID,
               pic,
-              API.TargetType.PROJECT,
+              API.TargetType.DATA_SET,
               ContributorKey,
-              YourName);
+              form.Title());
           mediaID = uInfo.mediaId;
           Log.i("iSENSE", "MediaID: " + mediaID);
           if (mediaID == -1) {

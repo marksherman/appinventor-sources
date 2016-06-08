@@ -82,12 +82,6 @@ public class PropertyTypeConstants {
   public static final String PROPERTY_TYPE_INTEGER = "integer";
   
   /**
-   * iSENSE values.
-   * @see com.google.appinventor.client.editor.youngandroid.properties.YoungAndroidiSENSELoginTypePropertyEditor
-   */
-  public static final String PROPERTY_TYPE_ISENSE_LOGIN_TYPE = "isense_login_type";
-  
-  /**
    * Lego NXT sensor ports.
    * @see
    * com.google.appinventor.client.editor.youngandroid.properties.YoungAndroidLegoNxtSensorPortChoicePropertyEditor

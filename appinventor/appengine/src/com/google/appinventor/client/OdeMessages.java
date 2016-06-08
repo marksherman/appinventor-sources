@@ -3300,10 +3300,6 @@ public interface OdeMessages extends Messages {
   @Description("")
   String ProjectIDProperties();
 
-  @DefaultMessage("Your Name")
-  @Description("")
-  String YourNameProperties(); 
-
   //Params
   @DefaultMessage("xAccel")
   @Description("")
