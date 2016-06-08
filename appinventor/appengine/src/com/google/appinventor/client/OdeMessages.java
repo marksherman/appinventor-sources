@@ -5322,7 +5322,7 @@ public interface OdeMessages extends Messages {
 
   @DefaultMessage("<p>This component allows an app to upload data to iSENSE. For more information, visit www.isenseproject.org. </p> ")
   @Description("")
-  String iSENSEHelpStringComponentPallette();
+  String iSENSEPublisherHelpStringComponentPallette();
   
   @DefaultMessage("A Label displays a piece of text, which is specified through the <code>Text</code> property.  Other properties, all of which can be set in the Designer or Blocks Editor, control the appearance and placement of the text.")
   @Description("")
@@ -5812,10 +5812,6 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("PostMedia")
   @Description("")
   String PostMediaMethods();
-  
-  @DefaultMessage("Contributor Key")
-  @Description("Text for iSENSE login type Contributor Key")
-  String contributorKeyiSENSELoginType();  
   
   @DefaultMessage("Scale proportionally")
   @Description("A choice in ScalingChoicePropertyEditor")

@@ -377,7 +377,7 @@ public class YaVersion {
   // For YOUNG_ANDROID_VERSION 148:
   // - FIREBASE_COMPONENT_VERSION was incremented to 1
   // For YOUNG_ANDROID_VERSION 149: 
-  // - ISENSE_COMPONENT_VERSION was incremented to 1
+  // - ISENSEPUBLISHER_COMPONENT_VERSION was incremented to 1
   // For YOUNG_ANDROID_VERSION 150:
   // - CLOCK_COMPONENT_VERSION was incremented to 3
   // For YOUNG_ANDROID_VERSION 150:
@@ -721,8 +721,8 @@ public class YaVersion {
   // - Callback parameters speed and heading were added to Flung. (for all sprites)
   public static final int IMAGESPRITE_COMPONENT_VERSION = 6;
 
-  // iSENSE
-  public static final int ISENSE_COMPONENT_VERSION = 1; 
+  // iSENSE Publisher
+  public static final int ISENSEPUBLISHER_COMPONENT_VERSION = 1; 
 
   // For LABEL_COMPONENT_VERSION 2:
   // - The Alignment property was renamed to TextAlignment.

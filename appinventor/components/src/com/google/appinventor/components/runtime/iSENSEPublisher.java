@@ -42,16 +42,17 @@ import edu.uml.cs.isense.objects.RDataSet;
 import edu.uml.cs.isense.objects.RPerson;
 import edu.uml.cs.isense.objects.RProjectField;
 
-@DesignerComponent(version = YaVersion.ISENSE_COMPONENT_VERSION,
+
+@DesignerComponent(version = YaVersion.ISENSEPUBLISHER_COMPONENT_VERSION,
     description = "A component that provides a high-level interface to iSENSEProject.org",
-    category = ComponentCategory.SOCIAL,
+    category = ComponentCategory.CONNECTIVITY,
     nonVisible = true,
     iconName = "images/isense.png")
 @SimpleObject
 @UsesPermissions(permissionNames = "android.permission.INTERNET,android.permission.ACCESS_NETWORK_STATE")
 @UsesLibraries(libraries = "isense.jar")
 
-public final class iSENSE extends AndroidNonvisibleComponent implements Component {
+public final class iSENSEPublisher extends AndroidNonvisibleComponent implements Component {
 
   private int ProjectID;
   private int dataSetID = -1;
@@ -63,7 +64,7 @@ public final class iSENSE extends AndroidNonvisibleComponent implements Componen
   private static Activity activity; 
   private static Form form; 
 
-  public iSENSE(ComponentContainer container) {
+  public iSENSEPublisher(ComponentContainer container) {
     super(container.$form());
     Log.i("iSENSE", "Starting? " + container.toString());
     api = API.getInstance();
