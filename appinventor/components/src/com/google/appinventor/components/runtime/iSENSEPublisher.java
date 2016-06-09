@@ -62,7 +62,8 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
   private final API api;
   private final Handler androidUIHandler;
   private static Activity activity; 
-  private static Form form; 
+
+  private final String CONTRIBUTORNAME = "AppVis"; 
 
   public iSENSEPublisher(ComponentContainer container) {
     super(container.$form());
@@ -73,7 +74,6 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
     pending = new LinkedList<DataObject>(); 
     androidUIHandler = new Handler();
     activity = container.$context(); 
-    form = container.$form(); 
   } 
 
   // Block Properties
@@ -189,7 +189,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       Calendar cal = Calendar.getInstance();
       SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy HH:mm:ss aaa");
       String date = " - " + sdf.format(cal.getTime()).toString();
-      uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, form.Title()); 
+      uInfo = api.uploadDataSet(ProjectID, jData, dob.name + date, ContributorKey, CONTRIBUTORNAME); 
 
       int dataSetId = uInfo.dataSetId; 
       Log.i("iSENSE", "JSON Upload: " + jData.toString()); 
@@ -255,13 +255,14 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
             UploadPhotoToDataSetFailed();
             return;
           }
+          pic.setReadable(true); 
           Log.i("iSENSE", "Trying to upload: " + path); 
           UploadInfo uInfo = new UploadInfo(); 
           uInfo = api.uploadMedia(DataSetID,
               pic,
               API.TargetType.DATA_SET,
               ContributorKey,
-              form.Title());
+              CONTRIBUTORNAME);
           mediaID = uInfo.mediaId;
           Log.i("iSENSE", "MediaID: " + mediaID);
           if (mediaID == -1) {
