@@ -109,6 +109,11 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       if (Fields.size() != Data.size()) {
         UploadDataSetFailed(); 
       } 
+      // A simple throttle if too much data is being thrown at the upload queue 
+      if (pending.size() > 20) {
+        Log.i("iSENSE", "Too many items in upload queue!"); 
+        UploadDataSetFailed(); 
+      }
       // Create new "DataObject" and add to upload queue
       DataObject dob = new DataObject(DataSetName, Fields, Data);
       pending.add(dob);  
