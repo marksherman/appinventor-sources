@@ -4314,14 +4314,6 @@ public interface OdeMessages extends Messages {
   @Description("")
   String UploadDataSetSucceededEvents();
  
-  @DefaultMessage("Upload Photo to Data Set Failed")
-  @Description("")
-  String UploadPhotoToDataSetFailedEvents();
-  
-  @DefaultMessage("Upload Photo to Data Set Succeeded")
-  @Description("")
-  String UploadPhotoToDataSetSucceededEvents();
-
   @DefaultMessage("GyroscopeChanged")
   @Description("")
   String GyroscopeChangedEvents();
@@ -5203,9 +5195,9 @@ public interface OdeMessages extends Messages {
   @Description("")
   String UploadDataSetMethods();
 
-  @DefaultMessage("UploadPhotoToDataSet")
+  @DefaultMessage("UploadDataSetWithPhoto")
   @Description("")
-  String UploadPhotoToDataSetMethods();  
+  String UploadDataSetWithPhotoMethods();  
 
   //Mock Components
   @DefaultMessage("add items...")

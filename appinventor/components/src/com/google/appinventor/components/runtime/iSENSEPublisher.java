@@ -120,17 +120,61 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       new UploadTask().execute(); 
     }
 
+  // Upload Dataset With Photo
+  @SimpleFunction(description = "Uploads a dataset and a photo")
+    public void UploadDataSetWithPhoto(final String DataSetName, final YailList Fields, final YailList Data, final String Photo) {
+      // ensure that the lists are the same size 
+      if (Fields.size() != Data.size()) {
+        UploadDataSetFailed(); 
+      } 
+      // A simple throttle if too much data is being thrown at the upload queue 
+      if (pending.size() > 20) {
+        Log.i("iSENSE", "Too many items in upload queue!"); 
+        UploadDataSetFailed(); 
+      }
+      // Validate photo
+      String path = ""; 
+      String[] pathtokens = Photo.split("/"); 
+      // If camera photo 
+      if (pathtokens[0].equals("file:")) {
+        try {
+          path = new File(new URL(Photo).toURI()).getAbsolutePath(); 
+        } catch (Exception e) {
+          Log.e("iSENSE", "Malformed URL or URI!"); 
+        }
+      } else { // Assets photo
+        path = "/sdcard/AppInventor/assets/" + Photo; 
+      }
+
+      // Create new "DataObject" and add it to the upload queue
+      DataObject dob = new DataObject(DataSetName, Fields, Data, path); 
+      pending.add(dob); 
+      new UploadTask().execute(); 
+
+    } 
+
   // Private class that gives us a data structure with info for uploading a dataset
   class DataObject {
 
     String name; 
     YailList fields; 
     YailList data; 
+    String path; 
 
+    // Normal dataset 
     DataObject(String name, YailList fields, YailList data) {
       this.name = name; 
       this.fields = fields;
       this.data = data; 
+      this.path = ""; 
+    }
+
+    // Dataset with photo
+    DataObject(String name, YailList fields, YailList data, String path) {
+      this.name = name; 
+      this.fields = fields;
+      this.data = data; 
+      this.path = path; 
     }
   }
 
@@ -194,6 +238,26 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       int dataSetId = uInfo.dataSetId; 
       Log.i("iSENSE", "JSON Upload: " + jData.toString()); 
       Log.i("iSENSE", "Dataset ID: " + dataSetId); 
+      if (dataSetId == -1) {
+        return -1; 
+      }
+
+      // do we have a photo to upload? 
+      if (!dob.path.equals("")) {
+        File pic = new File(dob.path); 
+        if (!pic.exists()) {
+          Log.e("iSENSE", "picture does not exist!"); 
+          return -1;
+        }
+        pic.setReadable(true); 
+        Log.i("iSENSE", "Trying to upload: " + dob.path); 
+        uInfo = api.uploadMedia(dataSetId, pic, API.TargetType.DATA_SET, ContributorKey, CONTRIBUTORNAME);
+        int mediaID = uInfo.mediaId;
+        Log.i("iSENSE", "MediaID: " + mediaID);
+        if (mediaID == -1) {
+          return -1; 
+        } 
+      }
       return dataSetId; 
     } 
 
@@ -206,7 +270,6 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
         UploadDataSetSucceeded(result); 
       }
     }
-
   }
 
   // Get Dataset By Field
@@ -230,50 +293,6 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       return pending.size(); 
     }
 
-  // Upload Photo To Dataset
-  // Note that this function has never worked correctly and is still in development
-  @SimpleFunction(description = "Uploads a photo to a dataset")
-    public void UploadPhotoToDataSet(final int DataSetID, final String Photo) {
-      androidUIHandler.post(new Runnable() {
-        public void run() {
-          // Validate photo
-          String path = ""; 
-          String[] pathtokens = Photo.split("/"); 
-          // If camera photo 
-          if (pathtokens[0].equals("file:")) {
-            try {
-              path = new File(new URL(Photo).toURI()).getAbsolutePath(); 
-            } catch (Exception e) {
-              Log.e("iSENSE", "Malformed URL or URI!"); 
-            }
-          } else { // Assets photo
-            path = "/sdcard/AppInventor/assets/" + Photo; 
-          } 
-          File pic = new File(path); 
-          if (!pic.exists()) {
-            Log.e("iSENSE", "picture does not exist!"); 
-            UploadPhotoToDataSetFailed();
-            return;
-          }
-          pic.setReadable(true); 
-          Log.i("iSENSE", "Trying to upload: " + path); 
-          UploadInfo uInfo = new UploadInfo(); 
-          uInfo = api.uploadMedia(DataSetID,
-              pic,
-              API.TargetType.DATA_SET,
-              ContributorKey,
-              CONTRIBUTORNAME);
-          mediaID = uInfo.mediaId;
-          Log.i("iSENSE", "MediaID: " + mediaID);
-          if (mediaID == -1) {
-            UploadPhotoToDataSetFailed();
-          } else {
-            UploadPhotoToDataSetSucceeded(mediaID);
-          }
-        }
-      });
-    }
-
   @SimpleFunction(description = "logcat")
     public void LogToCat(String catify) {
       Log.i("iSENSE", catify);
@@ -289,13 +308,4 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       EventDispatcher.dispatchEvent(this, "UploadDataSetFailed");
     }
 
-  @SimpleEvent(description = "iSENSE Upload Photo To Data Set Succeeded")
-    public void UploadPhotoToDataSetSucceeded(int mediaId) {
-      EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetSucceeded", mediaId);
-    }
-
-  @SimpleEvent(description = "iSENSE Upload Photo To Data Set Failed")
-    public void UploadPhotoToDataSetFailed() {
-      EventDispatcher.dispatchEvent(this, "UploadPhotoToDataSetFailed");
-    }
 }
