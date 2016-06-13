@@ -184,6 +184,8 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
     // This is what actually runs in the background thread, so it's safe to block
     protected Integer doInBackground(Void... v) {
 
+      api.useDev(true); 
+
       // Sleep while we don't have a wifi connection or a mobile connection
       ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
 
