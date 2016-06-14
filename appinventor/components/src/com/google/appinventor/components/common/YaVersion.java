@@ -724,6 +724,9 @@ public class YaVersion {
   // iSENSE Publisher
   public static final int ISENSEPUBLISHER_COMPONENT_VERSION = 1; 
 
+  // iSENSE Viewer
+  public static final int ISENSEVIEWER_COMPONENT_VERSION = 1; 
+
   // For LABEL_COMPONENT_VERSION 2:
   // - The Alignment property was renamed to TextAlignment.
   // For LABEL_COMPONENT_VERSION 3:

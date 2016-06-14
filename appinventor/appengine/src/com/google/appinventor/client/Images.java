@@ -436,7 +436,13 @@ public interface Images extends Resources {
    */
   @Source("com/google/appinventor/images/isense.png")
   ImageResource iSENSEPublisherComponent();
-  
+ 
+  /**
+   * Designer palette item: iSENSE Viewer component
+   */
+  @Source("com/google/appinventor/images/isense.png")
+  ImageResource iSENSEViewerComponent();
+   
   /** 
    * Designer palette item: GyroscopeSensor component
    */
