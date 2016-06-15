@@ -184,8 +184,6 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
     // This is what actually runs in the background thread, so it's safe to block
     protected Integer doInBackground(Void... v) {
 
-      api.useDev(true); 
-
       // Sleep while we don't have a wifi connection or a mobile connection
       ConnectivityManager cm = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE); 
 
@@ -251,9 +249,10 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
           Log.e("iSENSE", "picture does not exist!"); 
           return -1;
         }
-        pic.setReadable(true); 
+        pic.setReadable(true);
+        //Log.i("iSENSE", "Trying to upload: " + dob.path); 
         Log.i("iSENSE", "Trying to upload: " + dob.path); 
-        uInfo = api.uploadMedia(dataSetId, pic, API.TargetType.DATA_SET, ContributorKey, CONTRIBUTORNAME);
+        uInfo = api.uploadMedia(ProjectID, pic, API.TargetType.PROJECT, ContributorKey, CONTRIBUTORNAME);
         int mediaID = uInfo.mediaId;
         Log.i("iSENSE", "MediaID: " + mediaID);
         if (mediaID == -1) {
@@ -282,7 +281,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
     }
 
   // Get Time (formatted for iSENSE Upload)
-  @SimpleFunction(description = "Gets the current time. It is formated correctly for iSENSE")
+  @SimpleFunction(description = "Gets the current time. It is formatted correctly for iSENSE")
     public String GetTime() {
       Calendar cal = Calendar.getInstance();
       SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -293,11 +292,6 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
   @SimpleFunction(description = "Gets number of pending background uploads. Advanced feature.")
     public int GetNumberPendingUploads() {
       return pending.size(); 
-    }
-
-  @SimpleFunction(description = "logcat")
-    public void LogToCat(String catify) {
-      Log.i("iSENSE", catify);
     }
 
   @SimpleEvent(description = "iSENSE Upload Data Set Succeeded")
