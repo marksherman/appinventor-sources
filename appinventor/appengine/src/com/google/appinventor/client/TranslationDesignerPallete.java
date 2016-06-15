@@ -232,6 +232,8 @@ public class TranslationDesignerPallete {
       value = MESSAGES.ImageSpriteHelpStringComponentPallette();
     } else if (key.equals("iSENSEPublisher-helpString")) {
       value = MESSAGES.iSENSEPublisherHelpStringComponentPallette();
+    } else if (key.equals("iSENSEViewer-helpString")) {
+      value = MESSAGES.iSENSEViewerHelpStringComponentPallette(); 
     } else if (key.equals("Label-helpString")) {
       value = MESSAGES.LabelHelpStringComponentPallette();
     } else if (key.equals("ListPicker-helpString")) {

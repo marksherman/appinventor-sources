@@ -2159,6 +2159,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String imageComponentPallette();
 
+  @DefaultMessage("iSENSEViewer")
+  @Description("")
+  String iSENSEViewerComponentPallette(); 
+
   @DefaultMessage("Label")
   @Description("")
   String labelComponentPallette();
@@ -2374,6 +2378,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("GameClient")
   @Description("")
   String gameClientComponentPallette();
+
+  @DefaultMessage("iSENSEPublisher")
+  @Description("")
+  String iSENSEPublisherComponentPallette(); 
 
   @DefaultMessage("SoundRecorder")
   @Description("")
@@ -3303,6 +3311,18 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("ProjectID")
   @Description("")
   String ProjectIDProperties();
+
+  @DefaultMessage("PresentationMode")
+  @Description("")
+  String PresentationModeProperties();
+
+  @DefaultMessage("ProjectId")
+  @Description("")
+  String ProjectIdProperties();
+
+  @DefaultMessage("URL")
+  @Description("")
+ String URLProperties();  
 
   //Params
   @DefaultMessage("xAccel")
@@ -5191,10 +5211,6 @@ public interface OdeMessages extends Messages {
   @Description("")
   String GetNumberPendingUploadsMethods(); 
 
-  @DefaultMessage("logcat")
-  @Description("")
-  String LogToCatMethods();
-
   @DefaultMessage("UploadDataSet")
   @Description("")
   String UploadDataSetMethods();
@@ -5319,6 +5335,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("<p>This component allows an app to upload data to iSENSE. For more information, visit www.isenseproject.org. </p> ")
   @Description("")
   String iSENSEPublisherHelpStringComponentPallette();
+
+  @DefaultMessage("<p>This component allows an app to view a specific visualization on the iSENSE website. For more information, visit www.isenseproject.org.</p> ")
+  @Description("")
+  String iSENSEViewerHelpStringComponentPallette(); 
   
   @DefaultMessage("A Label displays a piece of text, which is specified through the <code>Text</code> property.  Other properties, all of which can be set in the Designer or Blocks Editor, control the appearance and placement of the text.")
   @Description("")

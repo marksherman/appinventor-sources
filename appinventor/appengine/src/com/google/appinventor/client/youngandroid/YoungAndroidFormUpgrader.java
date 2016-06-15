@@ -275,6 +275,12 @@ public final class YoungAndroidFormUpgrader {
       } else if (componentType.equals("ImageSprite")) {
         srcCompVersion = upgradeImageSpriteProperties(componentProperties, srcCompVersion);
 
+      } else if (componentType.equals("iSENSEPublisher")) {
+        srcCompVersion = upgradeiSENSEPublisherProperties(componentProperties, srcCompVersion); 
+
+      } else if (componentType.equals("iSENSEViewer")) {
+        srcCompVersion = upgradeiSENSEViewerProperties(componentProperties, srcCompVersion); 
+
       } else if (componentType.equals("Label")) {
         srcCompVersion = upgradeLabelProperties(componentProperties, srcCompVersion);
 
@@ -1015,6 +1021,18 @@ public final class YoungAndroidFormUpgrader {
       srcCompVersion = 6;
     }
     return srcCompVersion;
+  }
+
+  // initial component version; placeholder for later
+  private static int upgradeiSENSEPublisherProperties(Map<String, JSONValue> componentProperties, 
+      int srcCompVersion) {
+    return srcCompVersion; 
+  }
+
+  // initial component version; placeholder for later
+  private static int upgradeiSENSEViewerProperties(Map<String, JSONValue> componentProperties, 
+      int srcCompVersion) {
+    return srcCompVersion; 
   }
 
   private static int upgradeLabelProperties(Map<String, JSONValue> componentProperties,
