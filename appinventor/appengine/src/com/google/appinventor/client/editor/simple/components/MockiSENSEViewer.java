@@ -22,7 +22,7 @@ public final class MockiSENSEViewer extends MockVisibleComponent {
   public static final String TYPE = "iSENSEViewer";
 
   // Large icon image for use in designer.  Smaller version is in the palette.
-  private final Image largeImage = new Image(images.webviewerbig());
+  private final Image largeImage = new Image(images.isenselarge());
 
   /**
    * Creates a new MockiSENSEViewer component.
@@ -30,7 +30,7 @@ public final class MockiSENSEViewer extends MockVisibleComponent {
    * @param editor  editor of source file the component belongs to
    */
   public MockiSENSEViewer(SimpleEditor editor) {
-    super(editor, TYPE, images.webviewer());
+    super(editor, TYPE, images.isense());
 
     // Initialize mock WebViewer UI
     SimplePanel webViewerWidget = new SimplePanel();

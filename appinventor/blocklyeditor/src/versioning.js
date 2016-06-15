@@ -1500,7 +1500,7 @@ Blockly.Versioning.AllUpgradeMaps =
 
   "iSENSEViewer": {
     // This is the initial version. Placeholder for future upgrades.
-    1: "noUpgrade:
+    1: "noUpgrade"
   }, // End iSENSEViewer upgraders
 
   "Label": {

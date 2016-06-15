@@ -3316,10 +3316,6 @@ public interface OdeMessages extends Messages {
   @Description("")
   String PresentationModeProperties();
 
-  @DefaultMessage("ProjectId")
-  @Description("")
-  String ProjectIdProperties();
-
   @DefaultMessage("URL")
   @Description("")
  String URLProperties();  
