@@ -163,6 +163,15 @@ public final class iSENSEViewer extends AndroidViewComponent {
       return (webview.getTitle() == null) ? "" : webview.getTitle();
     }
 
+
+  /**
+   * Refresh the current visualization 
+   */ 
+  @SimpleFunction(description = "Refresh the visualization")
+    public void Refresh() {
+      webview.loadUrl(URL()); 
+    }
+
   private void resetWebViewClient() {
     boolean ignoreSslErrors = false;
     boolean followLinks = false;
