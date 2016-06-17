@@ -2274,6 +2274,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String imageComponentPallette();
 
+  @DefaultMessage("iSENSE")
+  @Description("")
+  String iSENSEComponentPallette(); 
+
   @DefaultMessage("iSENSEViewer")
   @Description("")
   String iSENSEViewerComponentPallette(); 
@@ -5767,7 +5771,11 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("<p>This component allows an app to view a specific visualization on the iSENSE website. For more information, visit www.isenseproject.org.</p> ")
   @Description("")
   String iSENSEViewerHelpStringComponentPallette(); 
-  
+ 
+  @DefaultMessage("<p>Deprecated</p>")
+  @Description("")
+  String iSENSEHelpStringComponentPallette(); 
+
   @DefaultMessage("A Label displays a piece of text, which is specified through the <code>Text</code> property.  Other properties, all of which can be set in the Designer or Blocks Editor, control the appearance and placement of the text.")
   @Description("")
   String LabelHelpStringComponentPallette();

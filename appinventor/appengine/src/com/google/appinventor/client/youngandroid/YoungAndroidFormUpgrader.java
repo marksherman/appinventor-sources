@@ -286,6 +286,9 @@ public final class YoungAndroidFormUpgrader {
       } else if (componentType.equals("iSENSEPublisher")) {
         srcCompVersion = upgradeiSENSEPublisherProperties(componentProperties, srcCompVersion); 
 
+      } else if (componentType.equals("iSENSE")) {
+        srcCompVersion = upgradeiSENSEProperties(componentProperties, srcCompVersion); 
+
       } else if (componentType.equals("iSENSEViewer")) {
         srcCompVersion = upgradeiSENSEViewerProperties(componentProperties, srcCompVersion); 
 
@@ -1044,6 +1047,11 @@ public final class YoungAndroidFormUpgrader {
   private static int upgradeiSENSEViewerProperties(Map<String, JSONValue> componentProperties, 
       int srcCompVersion) {
     return srcCompVersion; 
+  }
+
+  // deprecated iSENSE component
+  private static int upgradeiSENSEProperties(Map<String, JSONValue> componentProperties, int srcCompVersion) {
+    return 1; 
   }
 
   private static int upgradeLabelProperties(Map<String, JSONValue> componentProperties,

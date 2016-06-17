@@ -252,7 +252,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
         pic.setReadable(true);
         //Log.i("iSENSE", "Trying to upload: " + dob.path); 
         Log.i("iSENSE", "Trying to upload: " + dob.path); 
-        uInfo = api.uploadMedia(ProjectID, pic, API.TargetType.PROJECT, ContributorKey, CONTRIBUTORNAME);
+        uInfo = api.uploadMedia(ProjectID, pic, API.TargetType.DATA_SET, ContributorKey, CONTRIBUTORNAME);
         int mediaID = uInfo.mediaId;
         Log.i("iSENSE", "MediaID: " + mediaID);
         if (mediaID == -1) {
