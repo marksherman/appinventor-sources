@@ -376,8 +376,6 @@ public class YaVersion {
   // - IMAGE_COMPONENT_VERSION was incremented to 2.
   // For YOUNG_ANDROID_VERSION 148:
   // - FIREBASE_COMPONENT_VERSION was incremented to 1
-  // For YOUNG_ANDROID_VERSION 149: 
-  // - ISENSEPUBLISHER_COMPONENT_VERSION was incremented to 1
   // For YOUNG_ANDROID_VERSION 150:
   // - CLOCK_COMPONENT_VERSION was incremented to 3
   // For YOUNG_ANDROID_VERSION 150:
@@ -398,8 +396,10 @@ public class YaVersion {
   // For YOUNG_ANDROID_VERSION 157:
   // - LABEL_COMPONENT_VERSION was incremented to 4
   // For YOUNG_ANDROID_VERSION 158: 
-  // - iSENSE was removed
-  public static final int YOUNG_ANDROID_VERSION = 158;
+  // - iSENSE was replaced by iSENSEPublisher, iSENSEViewer added
+  // For YOUNG_ANDROID_VERSION 159: 
+  // -iSENSE completely deprecated
+  public static final int YOUNG_ANDROID_VERSION = 159;
 
   // ............................... Blocks Language Version Number ...............................
 
@@ -742,9 +742,6 @@ public class YaVersion {
 
   // iSENSE Viewer
   public static final int ISENSEVIEWER_COMPONENT_VERSION = 1; 
-
-  // deprecated iSENSE component
-  public static final int ISENSE_COMPONENT_VERSION = 1; 
 
   // For LABEL_COMPONENT_VERSION 2:
   // - The Alignment property was renamed to TextAlignment.

@@ -1503,10 +1503,6 @@ Blockly.Versioning.AllUpgradeMaps =
 
   }, // End ImageSprite upgraders
 
-  "iSENSE": {
-    1: "noUpgrade" // This component has been deprecated
-  }, 
-
   "iSENSEPublisher": {
     // This is the initial version. Placeholder for future upgrades.
     1: "noUpgrade"

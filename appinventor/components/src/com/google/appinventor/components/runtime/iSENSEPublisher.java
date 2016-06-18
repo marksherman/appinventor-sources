@@ -123,7 +123,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
     }
 
   // Upload Dataset With Photo
-  @SimpleFunction(description = "Uploads a dataset and a photo")
+ /* @SimpleFunction(description = "Uploads a dataset and a photo")
     public void UploadDataSetWithPhoto(final String DataSetName, final YailList Fields, final YailList Data, final String Photo) {
       // ensure that the lists are the same size 
       if (Fields.size() != Data.size()) {
@@ -156,7 +156,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       new UploadTask().execute(); 
 
     } 
-
+*/
   // Private class that gives us a data structure with info for uploading a dataset
   class DataObject {
 
