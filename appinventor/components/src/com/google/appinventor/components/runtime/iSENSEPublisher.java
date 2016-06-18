@@ -107,12 +107,14 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
     public void UploadDataSet(final String DataSetName, final YailList Fields, final YailList Data) {
       // ensure that the lists are the same size 
       if (Fields.size() != Data.size()) {
-        UploadDataSetFailed(); 
+        UploadDataSetFailed();
+        return;  
       } 
       // A simple throttle if too much data is being thrown at the upload queue 
       if (pending.size() > 20) {
         Log.i("iSENSE", "Too many items in upload queue!"); 
-        UploadDataSetFailed(); 
+        UploadDataSetFailed();
+        return;  
       }
       // Create new "DataObject" and add to upload queue
       DataObject dob = new DataObject(DataSetName, Fields, Data);
@@ -126,11 +128,13 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
       // ensure that the lists are the same size 
       if (Fields.size() != Data.size()) {
         UploadDataSetFailed(); 
+        return; 
       } 
       // A simple throttle if too much data is being thrown at the upload queue 
       if (pending.size() > 20) {
         Log.i("iSENSE", "Too many items in upload queue!"); 
-        UploadDataSetFailed(); 
+        UploadDataSetFailed();
+        return;  
       }
       // Validate photo
       String path = ""; 
@@ -249,8 +253,23 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
           Log.e("iSENSE", "picture does not exist!"); 
           return -1;
         }
+        String[] splt = pic.getName().split("[.]"); 
+        if (splt[0].length() > 20) {
+          String newname = splt[0].substring(0,20) + "." + splt[1]; 
+          String[] pathsplit = dob.path.split("/"); 
+          String newpath = ""; 
+          for (int i = 0; i < pathsplit.length - 1; i++) {
+            newpath += pathsplit[i] + "/"; 
+          }
+          File temp = new File(newpath + newname);
+          dob.path = newpath + newname;  
+          if (!pic.renameTo(temp)) {
+            Log.i("iSENSE", "Filename too long: " + pic.getName());
+            return -1;  
+          }
+          pic = temp;  
+        }
         pic.setReadable(true);
-        //Log.i("iSENSE", "Trying to upload: " + dob.path); 
         Log.i("iSENSE", "Trying to upload: " + dob.path); 
         uInfo = api.uploadMedia(ProjectID, pic, API.TargetType.DATA_SET, ContributorKey, CONTRIBUTORNAME);
         int mediaID = uInfo.mediaId;
