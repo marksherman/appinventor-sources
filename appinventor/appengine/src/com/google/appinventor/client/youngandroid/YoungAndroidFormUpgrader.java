@@ -152,6 +152,20 @@ public final class YoungAndroidFormUpgrader {
       }
     }
 
+    if (srcYaVersion < 159) {
+      // In YOUNG_ANDROID_VERSION 159, the iSENSE component was removed; iSENSEPublisher should be used
+      // instead.
+      // This uses the same method as the Logger update in YaVersion 2. 
+      if (componentType.equals("iSENSE")) {
+        componentType = "iSENSEPublisher";
+        srcCompVersion = COMPONENT_DATABASE.getComponentVersion(componentType);
+        componentProperties.put("$Type", new ClientJsonString(componentType));
+        componentProperties.put("$Version", new ClientJsonString("" + srcCompVersion));
+        upgradeDetails.append(MESSAGES.upgradeDetailLoggerReplacedWithNotifier(
+            componentProperties.get("$Name").asString().getString()));
+      }
+    }
+
     // Get the system component version from the component database.
     final int sysCompVersion;
     try {
