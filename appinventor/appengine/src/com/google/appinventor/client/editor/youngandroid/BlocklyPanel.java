@@ -609,6 +609,7 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
       doResetYail(formName);
     formName = newFormName;
     blocklyWorkspaceChanged(formName);
+    //TODO marksherman snapshot form/project change here
   }
 
   public void startRepl(boolean alreadyRunning, boolean forEmulator, boolean forUsb) { // Start the Repl
@@ -622,6 +623,33 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
   public static boolean checkIsAdmin() {
     return Ode.getInstance().getUser().getIsAdmin();
   }
+
+  //[marksherman, 2015/08/12] trying to get user data into blockly for snapshot collection
+  public static String getUserEmail() {
+    return Ode.getInstance().getUser().getUserEmail();
+  }
+
+  public static String getSessionId(){
+    return Ode.getInstance().getSessionId();
+  }
+
+  public static String getProjectName(){
+    long id = Ode.getInstance().getCurrentYoungAndroidProjectId();
+    return Ode.getInstance().getProjectManager().getProject(id).getProjectName();
+  }
+
+  public static String getProjectId(){
+    return String.valueOf( Ode.getInstance().getCurrentYoungAndroidProjectId() );
+  }
+
+  public static String getScreenName(){
+    return Ode.getInstance().getCurrentYoungAndroidSourceNode().getFormName();
+  }
+
+  public static String getFormContent(){
+    return "FORM!";
+  }
+  //end of marksherman snapshot helpers
 
   // Set currentScreen
   // We use this to determine if we should send Yail to a
@@ -891,6 +919,18 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
       $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getBackpack());
     $wnd.BlocklyPanel_setBackpack =
       $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::setBackpack(Ljava/lang/String;));
+    $wnd.BlocklyPanel_getUserEmail =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getUserEmail());
+    $wnd.BlocklyPanel_getSessionId =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getSessionId());
+    $wnd.BlocklyPanel_getProjectName =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getProjectName());
+    $wnd.BlocklyPanel_getProjectId =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getProjectId());
+    $wnd.BlocklyPanel_getScreenName =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getScreenName());
+    $wnd.BlocklyPanel_getFormContent =
+        $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getFormContent());
   }-*/;
 
   private native void initJS() /*-{

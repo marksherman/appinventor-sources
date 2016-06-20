@@ -146,6 +146,10 @@ Blockly.BlocklyEditor.startup = function(documentBody, formName) {
         // [lyn 12/31/2013] Check for duplicate component event handlers before
         // running any error handlers to avoid quadratic time behavior.
         Blockly.WarningHandler.determineDuplicateComponentEventHandlers();
+        // [msherman 2015-09-10] Capture and send a snapshot
+        // This is really fast- every pixel change of every drag fires it.
+        // Likely too fast for our capture, which only cares about the final resting place.
+        //Blockly.Snapshot.send('blocklyWorkspaceChange');
   });
 };
 
