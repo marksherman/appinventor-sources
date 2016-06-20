@@ -3464,7 +3464,7 @@ public interface OdeMessages extends Messages {
   @Description("")
   String WebViewStringProperties();
   
-  @DefaultMessage("Contributor Key")
+  @DefaultMessage("ContributorKey")
   @Description("")
   String ContributorKeyProperties();
   
@@ -4570,11 +4570,11 @@ public interface OdeMessages extends Messages {
   @Description("")
   String ShakingEvents();
   
-  @DefaultMessage("Upload Data Set Failed")
+  @DefaultMessage("UploadDataSetFailed")
   @Description("")
   String UploadDataSetFailedEvents();
   
-  @DefaultMessage("Upload Data Set Succeeded")
+  @DefaultMessage("UploadDataSetSucceeded")
   @Description("")
   String UploadDataSetSucceededEvents();
  

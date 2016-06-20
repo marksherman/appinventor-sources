@@ -64,6 +64,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
   private static Activity activity; 
 
   private final String CONTRIBUTORNAME = "AppVis"; 
+  private final int QUEUEDEPTH = 50; 
 
   public iSENSEPublisher(ComponentContainer container) {
     super(container.$form());
@@ -111,7 +112,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
         return;  
       } 
       // A simple throttle if too much data is being thrown at the upload queue 
-      if (pending.size() > 20) {
+      if (pending.size() > QUEUEDEPTH) {
         Log.i("iSENSE", "Too many items in upload queue!"); 
         UploadDataSetFailed();
         return;  
@@ -131,7 +132,7 @@ public final class iSENSEPublisher extends AndroidNonvisibleComponent implements
         return; 
       } 
       // A simple throttle if too much data is being thrown at the upload queue 
-      if (pending.size() > 20) {
+      if (pending.size() > QUEUEDEPTH) {
         Log.i("iSENSE", "Too many items in upload queue!"); 
         UploadDataSetFailed();
         return;  
