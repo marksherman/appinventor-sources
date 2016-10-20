@@ -197,10 +197,6 @@ Blockly.ReplMgr.RefreshAssets = null;
 
 Blockly.ReplMgr.pollYail = function() {
 
-    // [msherman 2015-06-16] Capture and send a snapshot
-    Blockly.Snapshot.send("pollYail");
-    //this might be better than blocklyeditor.js:149, as this aggregates transactions slightly
-
     try {
         if (window === undefined)    // If window is gone, then we are a zombie timer firing
             return;                  // in a destroyed frame.

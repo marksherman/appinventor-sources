@@ -100,7 +100,6 @@
     "./src/backpackFlyout.js",
 
     //Mark Sherman's code snapshot system
-    "./src/snapshot.js",
 
     //blocks files
     './src/blocks/control.js',
