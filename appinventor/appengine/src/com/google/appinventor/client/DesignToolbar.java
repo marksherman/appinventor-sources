@@ -162,6 +162,9 @@ public class DesignToolbar extends Toolbar {
           new RemoveFormAction()));
     }
 
+    addButton(new ToolbarItem("OpenResearchToolbar",
+            "Open Research Toolbar", new ShowResearchToolsDialogAction()), true);
+
     addButton(new ToolbarItem(WIDGET_NAME_SWITCH_TO_FORM_EDITOR,
         MESSAGES.switchToFormEditorButton(), new SwitchToFormEditorAction()), true);
     addButton(new ToolbarItem(WIDGET_NAME_SWITCH_TO_BLOCKS_EDITOR,
@@ -322,6 +325,13 @@ public class DesignToolbar extends Toolbar {
       }
     }
   }
+
+  private class ShowResearchToolsDialogAction implements Command {
+    @Override
+    public void execute() {
+      Ode.getInstance().getResearchToolsDialog().show();
+    };
+  };
 
   public void addProject(long projectId, String projectName) {
     if (!projectMap.containsKey(projectId)) {

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
+import static com.google.appinventor.client.Ode.getInstance;
 
 /**
  * Blocks editor panel.
@@ -54,7 +55,7 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
   public static enum OpType {ADD, REMOVE, RENAME}
 
   // The currently displayed form (project/screen)
-  private static String currentForm;
+  public static String currentForm;
   private static String languageSetting;
 
   private static class ComponentOp {
@@ -649,6 +650,28 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
   public static String getFormContent(){
     return "FORM!";
   }
+
+  /**
+   * @return status string suitable for display.
+   */
+  public static void startPlayback(String dataURL) {
+    doPlaybackStart(BlocklyPanel.currentForm, dataURL);
+  };
+  public static void getPlaybackStatus() {
+    doGetPlaybackStatus(BlocklyPanel.currentForm);
+  };
+  public static void playbackNext() {
+    doPlaybackNext(BlocklyPanel.currentForm);
+  };
+  public static void playbackPrev() {
+    doPlaybackPrev(BlocklyPanel.currentForm);
+  };
+  public static void playbackFirst() {
+    doPlaybackFirst(BlocklyPanel.currentForm);
+  };
+  public static void playbackLast() {
+    doPlaybackLast(BlocklyPanel.currentForm);
+  };
   //end of marksherman snapshot helpers
 
   // Set currentScreen
@@ -931,6 +954,10 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getScreenName());
     $wnd.BlocklyPanel_getFormContent =
         $entry(@com.google.appinventor.client.editor.youngandroid.BlocklyPanel::getFormContent());
+    $wnd.ResearchTools_setPlaybackStatus =
+        $entry(function(str) {
+            @com.google.appinventor.client.Ode::setResearchStatusText(Ljava/lang/String;)(str);
+        });
   }-*/;
 
   private native void initJS() /*-{
@@ -1083,4 +1110,39 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
   public static native void populateComponentTypes(String formName) /*-{
       $wnd.Blocklies[formName].ComponentTypes.populateTypes();
   }-*/;
+
+  /*
+   * Snapshot Playback Mechanism interfaces
+   * Part of Mark Sherman's dissertation system.
+   * This is for human-coding snapshots.
+   */
+  public static native void doPlaybackStart(String formName, String dataURL) /*-{
+      $wnd.Blocklies[formName].Playback.start(dataURL);
+  }-*/;
+  public static native void doGetPlaybackStatus(String formName) /*-{
+      if($wnd.Blocklies[formName].Playback.player){
+          $wnd.Blocklies[formName].Playback.player.status();
+      }
+  }-*/;
+  public static native void doPlaybackNext(String formName) /*-{
+      if($wnd.Blocklies[formName].Playback.player){
+          $wnd.Blocklies[formName].Playback.player.next();
+      }
+  }-*/;
+  public static native void doPlaybackPrev(String formName) /*-{
+      if($wnd.Blocklies[formName].Playback.player){
+          $wnd.Blocklies[formName].Playback.player.prev();
+      }
+  }-*/;
+  public static native void doPlaybackFirst(String formName) /*-{
+      if($wnd.Blocklies[formName].Playback.player){
+          $wnd.Blocklies[formName].Playback.player.first();
+      }
+  }-*/;
+  public static native void doPlaybackLast(String formName) /*-{
+      if($wnd.Blocklies[formName].Playback.player){
+          $wnd.Blocklies[formName].Playback.player.last();
+      }
+  }-*/;
+
 }

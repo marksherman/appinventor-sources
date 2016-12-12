@@ -2,10 +2,20 @@
 
 goog.provide('Blockly.Playback');
 
+Blockly.Playback.player = null;
+
 Blockly.Playback.start = function (filename){
+    if(Blockly.Playback.player === null){
+        Blockly.Playback.player = Blockly.Playback.init();
+    }
+    Blockly.Playback.player.start(filename);
+};
+
+Blockly.Playback.init = function (){
     var history = [];       // 0-indexed, unlike frame numbers, which are 1-indexed
     var length = 0;
     var currentFrame = 0;   // first frame is 1, not yet loaded is 0
+    var status = "";
 
     var injectBlocks = function (blocksXML){
         Blockly.mainWorkspace.clear(); // Remove any existing blocks before we add new ones.
@@ -32,7 +42,7 @@ Blockly.Playback.start = function (filename){
         return str;
     };
 
-    var printStatus = function () {
+    var updateStatusString = function () {
         str = "Frame " + currentFrame + " of " + length + "   time: " +
             timeString(history[currentFrame - 1]['seconds_elapsed']);
 
@@ -40,7 +50,11 @@ Blockly.Playback.start = function (filename){
             str += "   interval: " + timeString(history[currentFrame-1]['interval']);
         }
 
-        console.log(str);
+        status = str;
+    };
+
+    var printStatus = function () {
+        console.log(status);
     };
 
     var load = function (framenum){
@@ -48,7 +62,9 @@ Blockly.Playback.start = function (filename){
             injectBlocks(history[framenum - 1]['contents']['Screen1/blocks']);
             currentFrame = framenum;
         }
-        printStatus()
+        updateStatusString();
+        printStatus();
+        top.ResearchTools_setPlaybackStatus(status);
     };
 
     var loadProjectFile = function (filename){
@@ -61,15 +77,15 @@ Blockly.Playback.start = function (filename){
             });
     };
 
-    loadProjectFile(filename);
-
     return {
         length: function () { return length },
         load: load,
         next: function () { load( currentFrame + 1 ) },
         prev: function () { load( currentFrame - 1 ) },
+        first: function () { load(1) },
         last: function () { load( length ) },
-        start: loadProjectFile
+        start: loadProjectFile,
+        status: function () { return status }
     };
 
 };
