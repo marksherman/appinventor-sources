@@ -12,9 +12,9 @@ Blockly.Playback.start = function (filename){
 };
 
 Blockly.Playback.init = function (){
-    var history = [];       // 0-indexed, unlike frame numbers, which are 1-indexed
+    var history = [];
     var length = 0;
-    var currentFrame = 0;   // first frame is 1, not yet loaded is 0
+    var currentFrame = null;   // first frame is 0, not yet loaded is null
     var status = "";
 
     var injectBlocks = function (blocksXML){
@@ -22,11 +22,17 @@ Blockly.Playback.init = function (){
         Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, Blockly.Xml.textToDom(blocksXML));
     };
 
+    var updateCurrentFrame = function(frameNum){
+        currentFrame = frameNum;
+        top.ResearchTools_setPlaybackFrameNumber(frameNum);
+    };
+
     var timeString = function(seconds_elapsed){
-        seconds = seconds_elapsed % 60;
-        minutes = Math.floor(seconds_elapsed / 60) % 60;
-        hours = Math.floor(seconds_elapsed / 60 / 60);
-        str = "";
+        var seconds = seconds_elapsed % 60;
+        var minutes = Math.floor(seconds_elapsed / 60) % 60;
+        var hours = Math.floor(seconds_elapsed / 60 / 60);
+        var str = "";
+
         if(hours > 0){
             str += hours + "h";
             if(minutes < 10){
@@ -43,11 +49,11 @@ Blockly.Playback.init = function (){
     };
 
     var updateStatusString = function () {
-        str = "Frame " + currentFrame + " of " + length + "   time: " +
-            timeString(history[currentFrame - 1]['seconds_elapsed']);
+        var str = "FRAME " + currentFrame + " of " + (length - 1) + "   TIME: " +
+            timeString(history[currentFrame]['seconds_elapsed']);
 
-        if('interval' in history[currentFrame-1]){
-            str += "   interval: " + timeString(history[currentFrame-1]['interval']);
+        if('interval' in history[currentFrame]){
+            str += "   INTERVAL: " + timeString(history[currentFrame]['interval']);
         }
 
         status = str;
@@ -55,35 +61,41 @@ Blockly.Playback.init = function (){
 
     var printStatus = function () {
         console.log(status);
-    };
-
-    var load = function (framenum){
-        if (framenum <= length && framenum > 0) {
-            injectBlocks(history[framenum - 1]['contents']['Screen1/blocks']);
-            currentFrame = framenum;
-        }
-        updateStatusString();
-        printStatus();
         top.ResearchTools_setPlaybackStatus(status);
     };
 
+    var load = function (framenum){
+        if (framenum < length && framenum >= 0) {
+            injectBlocks(history[framenum]['contents']['Screen1/blocks']);
+            updateCurrentFrame(framenum);
+        }
+        updateStatusString();
+        printStatus();
+    };
+
     var loadProjectFile = function (filename){
-        fetch("http://localhost:8000/" + filename)
+        var fetchurl = '';
+        if (filename.startsWith('http')) {
+            fetchurl = filename;
+        } else {
+            fetchurl = "http://localhost:8000/" + filename
+        }
+        fetch(fetchurl)
             .then(function(result){return result.json();})
             .then(function(jsontext){
                 history = jsontext;
                 length = history.length;
-                load(1);
+                load(0);
             });
     };
 
     return {
         length: function () { return length },
         load: load,
-        next: function () { load( currentFrame + 1 ) },
-        prev: function () { load( currentFrame - 1 ) },
-        first: function () { load(1) },
-        last: function () { load( length ) },
+        next: function () { load(currentFrame + 1) },
+        prev: function () { load(currentFrame - 1) },
+        first: function () { load(0) },
+        last: function () { load(length - 1) },
         start: loadProjectFile,
         status: function () { return status }
     };

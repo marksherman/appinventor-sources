@@ -958,6 +958,10 @@ public class BlocklyPanel extends HTMLPanel implements ComponentDatabaseChangeLi
         $entry(function(str) {
             @com.google.appinventor.client.Ode::setResearchStatusText(Ljava/lang/String;)(str);
         });
+    $wnd.ResearchTools_setPlaybackFrameNumber =
+        $entry(function(frameNum) {
+            @com.google.appinventor.client.Ode::setResearchFrameNumber(I)(frameNum);
+        });
   }-*/;
 
   private native void initJS() /*-{

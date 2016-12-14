@@ -2148,90 +2148,11 @@ public class Ode implements EntryPoint {
     }
   }-*/;
 
-  public class ResearchToolsDialog extends DialogBox {
-
-    private final Button firstButton;
-    private final Button prevButton;
-    private final Button nextButton;
-    private final Button lastButton;
-    private final Button startButton;
-    private final Button closeButton;
-    private final Label infoLabel;
-
-    public void setStatusText(String newStatus){
-      infoLabel.setText(newStatus);
-    }
-
-    public ResearchToolsDialog() {
-      setText("Research Tools");
-      setModal(false);
-
-      firstButton = new Button("|<");
-      prevButton = new Button("Prev");
-      nextButton = new Button("Next");
-      lastButton = new Button(">|");
-      startButton = new Button("Start");
-
-      infoLabel = new Label("Frame 0 of 0 time: 0:00");
-      closeButton = new Button("close");
-
-      closeButton.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          ResearchToolsDialog.this.hide();
-        }
-      });
-
-      startButton.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          BlocklyPanel.startPlayback("d0.json");
-        }
-      });
-
-      nextButton.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          BlocklyPanel.playbackNext();
-        }
-      });
-
-      prevButton.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          BlocklyPanel.playbackPrev();
-        }
-      });
-
-      firstButton.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          BlocklyPanel.playbackFirst();
-        }
-      });
-
-      lastButton.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          BlocklyPanel.playbackLast();
-        }
-      });
-
-      HorizontalPanel panel = new HorizontalPanel();
-      panel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-      panel.add(startButton);
-      panel.add(firstButton);
-      panel.add(prevButton);
-      panel.add(infoLabel);
-      panel.add(nextButton);
-      panel.add(lastButton);
-
-      setWidget(panel);
-
-    }
-  }
-
   public static void setResearchStatusText(String status) {
     Ode.getInstance().getResearchToolsDialog().setStatusText(status);
+  }
+
+  public static void setResearchFrameNumber(int frameNum) {
+    Ode.getInstance().getResearchToolsDialog().setFrameNumber(frameNum);
   }
 }
