@@ -295,12 +295,12 @@ public class ResearchToolsDialog extends DialogBox {
     }
 
     private void loadCodesFromJSON(JSONObject codes){
-        solutionDebugSK.setValue(codes.get(SK_key).isBoolean().booleanValue());
-        solutionDebugS1.setValue(codes.get(S1_key).isBoolean().booleanValue());
-        solutionDebugS2.setValue(codes.get(S2_key).isBoolean().booleanValue());
-        solutionDebugLL.setValue(codes.get(LL_key).isBoolean().booleanValue());
-        solutionTemperature.setValue(codes.get(Temperature_key).isBoolean().booleanValue());
-        flailingCheckBox.setValue(codes.get(flailing_key).isBoolean().booleanValue());
+        solutionDebugSK.setValue(codes.get(SK_key) != null && codes.get(SK_key).isBoolean().booleanValue());
+        solutionDebugS1.setValue(codes.get(S1_key) != null && codes.get(S1_key).isBoolean().booleanValue());
+        solutionDebugS2.setValue(codes.get(S2_key) != null && codes.get(S2_key).isBoolean().booleanValue());
+        solutionDebugLL.setValue(codes.get(LL_key) != null && codes.get(LL_key).isBoolean().booleanValue());
+        solutionTemperature.setValue(codes.get(Temperature_key) != null && codes.get(Temperature_key).isBoolean().booleanValue());
+        flailingCheckBox.setValue(codes.get(flailing_key) != null && codes.get(flailing_key).isBoolean().booleanValue());
     }
 
     private static final String baseURL = "https://mark-dissertation-coding.firebaseio.com";
