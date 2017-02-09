@@ -3,6 +3,8 @@ package com.google.appinventor.client;
 import com.google.appinventor.client.editor.youngandroid.BlocklyPanel;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -220,6 +222,22 @@ public class ResearchToolsDialog extends DialogBox {
                         }
                     }
                 });
+            }
+        });
+
+        raterIdTextBox.addFocusHandler(new FocusHandler(){
+           public void onFocus(FocusEvent event){
+               if(raterIdTextBox.getText().equals(raterIdStartValue)){
+                   raterIdTextBox.setText("");
+               }
+           }
+        });
+
+        projectIdTextBox.addFocusHandler(new FocusHandler(){
+            public void onFocus(FocusEvent event){
+                if(projectIdTextBox.getText().equals(projectIdStartValue)){
+                    projectIdTextBox.setText("");
+                }
             }
         });
 
