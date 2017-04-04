@@ -70,8 +70,8 @@ public class ResearchToolsDialog extends DialogBox {
 
     private void startPlayback(){
         if(raterIdOk) {
-            //format: http://msp.cs.uml.edu/playback/t/RangoonBear.json
-            String startUrl = "http://msp.cs.uml.edu/playback/";
+            //format: https://msp.cs.uml.edu/playback/t/RangoonBear.json
+            String startUrl = "https://msp.cs.uml.edu/playback/";
             startUrl = startUrl.concat(projectID).concat(".json");
             //startUrl = "playback/d/AcapulcoDeer.json"; // local debug line
             BlocklyPanel.startPlayback(startUrl);
