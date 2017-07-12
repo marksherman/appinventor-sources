@@ -84,6 +84,7 @@ public final class ErrorMessages {
   public static final int ERROR_BLUETOOTH_UNSUPPORTED_ENCODING = 519;
   // ActivityStarter errors
   public static final int ERROR_ACTIVITY_STARTER_NO_CORRESPONDING_ACTIVITY = 601;
+  public static final int ERROR_ACTIVITY_STARTER_NO_ACTION_INFO = 602;
   // Media errors
   public static final int ERROR_UNABLE_TO_LOAD_MEDIA = 701;
   public static final int ERROR_UNABLE_TO_PREPARE_MEDIA = 702;
@@ -99,6 +100,9 @@ public final class ErrorMessages {
   // SoundRecorder errors
   public static final int ERROR_SOUND_RECORDER = 801;
   public static final int ERROR_SOUND_RECORDER_CANNOT_CREATE = 802;
+  public static final int ERROR_SOUND_RECORDER_ILLEGAL_STOP = 803;
+  public static final int ERROR_SOUND_RECORDER_MAX_DURATION_REACHED = 804;
+  public static final int ERROR_SOUND_RECORDER_MAX_FILESIZE_REACHED = 805;
   // Form errors
   public static final int ERROR_INVALID_SCREEN_ORIENTATION = 901;
   public static final int ERROR_SCREEN_NOT_FOUND = 902;
@@ -191,7 +195,21 @@ public final class ErrorMessages {
   // Image errors
   public static final int ERROR_IMAGE_CANNOT_ROTATE = 3001;
 
-  // Start the next group of errors at 3100
+  // LegoMindstormsEv3 errors
+  public static final int ERROR_EV3_BLUETOOTH_NOT_SET = 3100;
+  public static final int ERROR_EV3_NOT_CONNECTED_TO_ROBOT = 3101;
+  public static final int ERROR_EV3_INVALID_REPLY = 3102;
+  public static final int ERROR_EV3_ILLEGAL_ARGUMENT = 3103;
+  public static final int ERROR_EV3_ILLEGAL_MOTOR_PORT = 3104;
+  public static final int ERROR_EV3_ILLEGAL_SENSOR_PORT = 3105;
+
+  // Form errors that are signalled in runtime.scm
+  public static final int ERROR_DIVISION_BY_ZERO = 3200;
+
+  // Extension errors are signalled from extensions
+  public static final int ERROR_EXTENSION_ERROR = 3300;
+
+  // Start the next group of errors at 3400
 
   // Mapping of error numbers to error message format strings.
   private static final Map<Integer, String> errorMessages;
@@ -293,7 +311,20 @@ public final class ErrorMessages {
         "Cannot detect light level when the DetectColor property is set to True.");
     errorMessages.put(ERROR_NXT_INVALID_GENERATE_COLOR,
         "The GenerateColor property is limited to None, Red, Green, or Blue.");
-    // Bluetooth errors
+    // LegoMindstormsEv3 errors
+    errorMessages.put(ERROR_EV3_BLUETOOTH_NOT_SET,
+        "The Bluetooth property has not been set.");
+    errorMessages.put(ERROR_EV3_NOT_CONNECTED_TO_ROBOT,
+        "Cannot connect to an EV3 robot. Has the robot gone to sleep?");
+    errorMessages.put(ERROR_EV3_INVALID_REPLY,
+        "Unable to receive a reply or the reply cannot be understood.");
+    errorMessages.put(ERROR_EV3_ILLEGAL_ARGUMENT,
+        "Illegal argument: %s");
+    errorMessages.put(ERROR_EV3_ILLEGAL_MOTOR_PORT,
+        "Cannot understant motor port: %s");
+    errorMessages.put(ERROR_EV3_ILLEGAL_SENSOR_PORT,
+        "Cannot understant sensor port: %s");
+    // bluetooth errors
     errorMessages.put(ERROR_BLUETOOTH_NOT_AVAILABLE,
         "Bluetooth is not available.");
     errorMessages.put(ERROR_BLUETOOTH_NOT_ENABLED,
@@ -335,6 +366,8 @@ public final class ErrorMessages {
     // ActivityStarter errors
     errorMessages.put(ERROR_ACTIVITY_STARTER_NO_CORRESPONDING_ACTIVITY,
         "No corresponding activity was found.");
+    errorMessages.put(ERROR_ACTIVITY_STARTER_NO_ACTION_INFO,
+        "No Action information in ActivityStarter was found.");
     // Media errors
     errorMessages.put(ERROR_UNABLE_TO_LOAD_MEDIA,
         "Unable to load %s.");
@@ -358,6 +391,9 @@ public final class ErrorMessages {
      // SoundRecorder errors
     errorMessages.put(ERROR_SOUND_RECORDER, "An unexpected error occurred while recording sound.");
     errorMessages.put(ERROR_SOUND_RECORDER_CANNOT_CREATE, "Cannot start recording: %s");
+    errorMessages.put(ERROR_SOUND_RECORDER_ILLEGAL_STOP, "Stop() called when not recording.");
+    errorMessages.put(ERROR_SOUND_RECORDER_MAX_DURATION_REACHED, "Maximum sound recording duration was reached.");
+    errorMessages.put(ERROR_SOUND_RECORDER_MAX_FILESIZE_REACHED, "Maximum sound recording size was reached.");
     // Form errors
     errorMessages.put(ERROR_INVALID_SCREEN_ORIENTATION,
         "The specified screen orientation is not valid: %s");
@@ -472,6 +508,14 @@ public final class ErrorMessages {
     // Image errors
     errorMessages.put(ERROR_IMAGE_CANNOT_ROTATE,
         "The version of Android on this device does not support image rotation.");
+    // Form errors signaled in runtime.scm.   The error number used in runtime.scm to call
+    // signal-runtime-form-error must match the error number used here.
+    errorMessages.put(ERROR_DIVISION_BY_ZERO,
+        "Trying to divide %s by 0.  The result might not be valid.");
+    // Extension errors
+    errorMessages.put(ERROR_EXTENSION_ERROR,
+        "Error %d in extension %s: %s");
+
   }
 
   private ErrorMessages() {
@@ -482,4 +526,3 @@ public final class ErrorMessages {
     return String.format(format, messageArgs);
   }
 }
-

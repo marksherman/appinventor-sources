@@ -48,5 +48,12 @@ public final class YoungAndroidSettings extends Settings {
     addProperty(new EditableProperty(this,
         SettingsConstants.YOUNG_ANDROID_SETTINGS_SIZING, "Fixed",
         EditableProperty.TYPE_INVISIBLE));
+    addProperty(new EditableProperty(this,
+        SettingsConstants.YOUNG_ANDROID_SETTINGS_SHOW_LISTS_AS_JSON, "false",
+        EditableProperty.TYPE_INVISIBLE));
+    addProperty(new EditableProperty(this,
+        SettingsConstants.YOUNG_ANDROID_SETTINGS_TUTORIAL_URL, "",
+        EditableProperty.TYPE_INVISIBLE));
+
   }
 }

@@ -102,6 +102,10 @@ public interface OdeMessages extends Messages {
   @Description("Label of the button for checkpoint")
   String checkpointButton();
 
+  @DefaultMessage("Toggle Tutorial")
+  @Description("Label for the Toggle Tutorial Button")
+  String toggleTutorialButton();
+
   @DefaultMessage("Add Screen ...")
   @Description("Label of the button for adding a new screen")
   String addFormButton();
@@ -152,6 +156,14 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Language")
   @Description("Label of the button for switching language")
   String switchLanguageButton();
+
+  @DefaultMessage("Delete component")
+  @Description("Text on \"Delete component\" button")
+  String deleteComponentButton();
+
+  @DefaultMessage("Publish")
+  @Description("Text on \"Publish\" button")
+  String publishButton();
 
   // Not used anymore it is now dynamically created and translated at compile time depending on what
   //languages are translated and available.
@@ -271,9 +283,9 @@ public interface OdeMessages extends Messages {
   String labelConfirm();
 
   @DefaultMessage("Your app \"{0}\" has been removed from the gallery due to inappropriate content. "
-          + "Please review the guidelines at ..."
-          + "If you feel this action has been taken in error, or you would like to discuss the issue, "
-          + "please use the App Inventor forum at: \n")
+          + "Please review the guidelines at http://ai2.appinventor.mit.edu/about/termsofservice.html. "
+          + "If you feel this action has been taken in error, " +
+          "you may reply directly to this e-mail for discussion. \n")
   @Description("Label of the Text of Template 1 of reportlist")
   String inappropriateAppContentRemoveEmail(String title);
 
@@ -487,6 +499,100 @@ public interface OdeMessages extends Messages {
   @Description("Label of the button for delete keystore")
   String deleteKeystoreMenuItem();
 
+  //Component
+  @DefaultMessage("Components")
+  @Description("Name of Components tab")
+  String componentsTabName();
+
+  @DefaultMessage("My components")
+  @Description("Name of My components menuitem")
+  String myComponentsMenuItem();
+
+  @DefaultMessage("Start new component")
+  @Description("Name of Start new component menuitem")
+  String startNewComponentMenuItem();
+
+  @DefaultMessage("Import component to project ...")
+  @Description("Name of Import component menuitem")
+  String importComponentMenuItem();
+
+  @DefaultMessage("Import extension")
+  @Description("String shown in the palette to import an extension")
+  String importExtensionMenuItem();
+
+  @DefaultMessage("Build component")
+  @Description("Name of Build component menuitem")
+  String buildComponentMenuItem();
+
+  @DefaultMessage("Upload component (.aix) from my computer ...")
+  @Description("Name of Upload component menuitem")
+  String uploadComponentMenuItem();
+
+  @DefaultMessage("Upload Component...")
+  @Description("Caption for component upload wizard.")
+  String componentUploadWizardCaption();
+
+  @DefaultMessage("Import an extension into project")
+  @Description("Caption for component import wizard.")
+  String componentImportWizardCaption();
+
+  @DefaultMessage("Rename extension")
+  @Description("Caption for component rename wizard.")
+  String componentRenameWizardCaption();
+
+  @DefaultMessage("Extension name")
+  @Description("Caption for component Name Label in rename wizard.")
+  String componentNameLabel();
+
+  @DefaultMessage("Import Extension Failed!")
+  @Description("Error message reported when the component import failed")
+  String componentImportError();
+
+  @DefaultMessage("Extension Import failed due to unknown URL")
+  @Description("Error message reported when the component import failed due to unknown url")
+  String componentImportUnknownURLError();
+
+  @DefaultMessage("Extension Upgraded : ")
+  @Description("Alert message reported when the component import upgraded an already imported extension")
+  String componentUpgradedAlert();
+
+  @DefaultMessage("The selected file is not a component file!\n" +
+      "Component files are aix files.")
+  @Description("Error message reported when the file selected for upload is not a component archive.")
+  String notComponentArchiveError();
+
+  @DefaultMessage("Please select a component to import")
+  @Description("Error message reported when no component is selected to import.")
+  String noComponentSelectedError();
+
+  @DefaultMessage("Unable to find component \"{0}\" while loading project \"{1}\".")
+  @Description("Error message shown when a project references an unknown component.")
+  String noComponentFound(String componentName, String projectName);
+
+  @DefaultMessage("Please enter a url")
+  @Description("Error message reported when no url is entered.")
+  String noUrlError();
+
+  @DefaultMessage("Name")
+  @Description("Header for name column of component table")
+  String componentNameHeader();
+
+  @DefaultMessage("Version")
+  @Description("Header for version column of component table")
+  String componentVersionHeader();
+
+  @DefaultMessage("Are you really sure you want to delete the component(s): {0}?")
+  @Description("Confirmation message for deleting component(s)")
+  String confirmDeleteComponents(String componentNames);
+
+  @DefaultMessage("From my computer")
+  @Description("")
+  String componentImportFromComputer();
+
+  @DefaultMessage("URL")
+  @Description("For importing from a URL")
+  String componentImportFromURL();
+
   //Connect
   @DefaultMessage("Connect")
   @Description("Label of the button leading to Connect related cascade items")
@@ -582,6 +688,10 @@ public interface OdeMessages extends Messages {
   @Description("Name of Getting Started link")
   String getStartedMenuItem();
 
+  @DefaultMessage("Extensions")
+  @Description("Extensions link")
+  String extensionsMenuItem();
+
   @DefaultMessage("Tutorials")
   @Description("Name of Tutorials link")
   String tutorialsMenuItem();
@@ -654,6 +764,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Send an Email")
   @Description("Title for moderator send email dialog")
   String emailSendTitle();
+
+  @DefaultMessage("My Components")
+  @Description("Caption for component list box.")
+  String componentListBoxCaption();
 
   // Used in boxes/AssetListBox.java
 
@@ -847,6 +961,10 @@ public interface OdeMessages extends Messages {
   @Description("Error shown when a new component name would be the same as a component type name")
   String sameAsComponentTypeNameError();
 
+  @DefaultMessage("Component names cannot be the same as that of a component instance")
+  @Description("Error shown when a new component type would be the same as a component instance name")
+  String sameAsComponentInstanceNameError();
+
   @DefaultMessage("Component name cannot be any of the following: CsvUtil, Double, Float, " +
       "Integer, JavaCollection, JavaIterator, KawaEnvironment, Long, Short, SimpleForm, String, " +
       "Pattern, YailList, YailNumberToString, YailRuntimeError")
@@ -856,8 +974,13 @@ public interface OdeMessages extends Messages {
 
   @DefaultMessage("Deleting this component will delete all blocks associated with it in the " +
       "Blocks Editor. Are you sure you want to delete?")
-  @Description("Confirmation query for removing a component")
+  @Description("Confirmation query for deleting a component")
   String reallyDeleteComponent();
+
+  @DefaultMessage("Removing this component will delete all components and blocks associated with them in the " +
+          "Project. Are you sure you want to delete?")
+  @Description("Confirmation query for removing a component")
+  String reallyRemoveComponent();
 
   // Used in editor/simple/components/MockButtonBase.java, MockCheckBox.java, MockLabel.java, and
   // MockRadioButton.java
@@ -1874,6 +1997,10 @@ public interface OdeMessages extends Messages {
   @Description("Error message reported when a project couldn't be uploaded to the server.")
   String projectUploadError();
 
+  @DefaultMessage("Apps with extensions cannot be uploaded to the Gallery")
+  @Description("Error to report when an app with an extension is attempted to be added to the Gallery")
+  String galleryNoExtensionsPlease();
+
   @DefaultMessage("The selected project is not a project source file!\n" +
       "Project source files are aia files.")
   @Description("Error message reported when the file selected for upload is not a project archive.")
@@ -2065,6 +2192,17 @@ public interface OdeMessages extends Messages {
   @Description("Text messages are always received, and a notification is shown if the App is in the background.")
   String textReceivingChoiceAlways();
 
+  @DefaultMessage("Starting asset transfer to companion...")
+  @Description("Message to display at the start of an asset transfer before any assets are sent")
+  String startingAssetTransfer();
+
+  @DefaultMessage("Downloading {0} from the App Inventor server...")
+  @Description("Message to display when an asset is being downloaded from the server")
+  String loadingAsset(String assetPath);
+
+  @DefaultMessage("Sending {0} to companion...")
+  @Description("Message to display when sending an asset to the companion")
+  String sendingAssetToCompanion(String assetPath);
 
   // This error message is displayed as HTML
   @DefaultMessage("App Inventor is unable to compile this project.  " +
@@ -2072,11 +2210,55 @@ public interface OdeMessages extends Messages {
   @Description("Compilation error, with error message.")
   String unableToCompile(String errorMesssage);
 
+  @DefaultMessage("The APK file will be saved in the download folder.")
+  @Description("")
+  String apkSavedToComputer();
+
+  @DefaultMessage("The APK file will be installed in the phone.")
+  @Description("")
+  String apkInstalledToPhone();
+
+  @DefaultMessage("Waiting for the barcode.")
+  @Description("")
+  String waitingForBarcode();
+
+  @DefaultMessage("Preparing application icon")
+  @Description("")
+  String preparingApplicationIcon();
+
+  @DefaultMessage("Determining permissions")
+  @Description("")
+  String determiningPermissions();
+
+  @DefaultMessage("Generating application information")
+  @Description("")
+  String generatingApplicationInformation();
+
+  @DefaultMessage("Compiling part 1")
+  @Description("")
+  String compilingPart1();
+
+  @DefaultMessage("Compiling part 2 (please wait)")
+  @Description("")
+  String compilingPart2();
+
+  @DefaultMessage("Preparing final package")
+  @Description("")
+  String preparingFinalPackage();
+
+  @DefaultMessage("Building APK")
+  @Description("")
+  String buildingApk();
+
+  @DefaultMessage("HTMLFormat")
+  @Description("")
+  String HTMLFormatProperties();
+
   // This error message is displayed as HTML
 
   @DefaultMessage("User Interface")
   @Description("")
-  String UIComponentPallette();
+  String userInterfaceComponentPallette();
 
   @DefaultMessage("Layout")
   @Description("")
@@ -2088,7 +2270,7 @@ public interface OdeMessages extends Messages {
 
   @DefaultMessage("Drawing and Animation")
   @Description("")
-  String drawanimationComponentPallette();
+  String drawingAndAnimationComponentPallette();
 
   @DefaultMessage("Sensors")
   @Description("")
@@ -2102,9 +2284,13 @@ public interface OdeMessages extends Messages {
   @Description("")
   String storageComponentPallette();
 
+  @DefaultMessage("For internal use only")
+  @Description("")
+  String forInternalUseOnlyComponentPallette();
+
   @DefaultMessage("Form")
   @Description("")
-  String FormComponentPallette();
+  String formComponentPallette();
 
   @DefaultMessage("Math")
   @Description("Label on built-in-Math-blocks branch of block selector tree")
@@ -2116,7 +2302,15 @@ public interface OdeMessages extends Messages {
 
   @DefaultMessage("LEGO\u00AE MINDSTORMS\u00AE")
   @Description("")
-  String legoComponentPallette();
+  String legoMindstormsComponentPallette();
+
+  @DefaultMessage("Extension")
+  @Description("")
+  String extensionComponentPallette();
+
+  @DefaultMessage("External Components")
+  @Description("")
+  String externalComponentPalette();
 
   @DefaultMessage("Experimental")
   @Description("")
@@ -2170,6 +2364,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("PasswordTextBox")
   @Description("")
   String passwordTextBoxComponentPallette();
+
+  @DefaultMessage("Pedometer")
+  @Description("")
+  String pedometerComponentPallette();
 
   @DefaultMessage("Slider")
   @Description("")
@@ -2246,6 +2444,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String phoneNumberPickerComponentPallette();
 
+  @DefaultMessage("PhoneStatus")
+  @Description("")
+  String phoneStatusComponentPallette();
+
   @DefaultMessage("Sharing")
   @Description("")
   String sharingComponentPallette();
@@ -2275,6 +2477,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String locationSensorComponentPallette();
 
+  @DefaultMessage("MediaStore")
+  @Description("")
+  String mediaStoreComponentPallette();
+
   @DefaultMessage("NearField")
   @Description("")
   String nearFieldComponentPallette();
@@ -2288,6 +2494,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String horizontalArrangementComponentPallette();
 
+  @DefaultMessage("HorizontalScrollArrangement")
+  @Description("")
+  String horizontalScrollArrangementComponentPallette();
+
   @DefaultMessage("TableArrangement")
   @Description("")
   String tableArrangementComponentPallette();
@@ -2296,7 +2506,11 @@ public interface OdeMessages extends Messages {
   @Description("")
   String verticalArrangementComponentPallette();
 
-  // Lego Mindstorms
+  @DefaultMessage("VerticalScrollArrangement")
+  @Description("")
+  String verticalScrollArrangementComponentPallette();
+
+  // Lego Mindstorms NXT
   @DefaultMessage("NxtColorSensor")
   @Description("")
   String nxtColorSensorComponentPallette();
@@ -2324,6 +2538,39 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("NxtUltrasonicSensor")
   @Description("")
   String nxtUltrasonicSensorComponentPallette();
+
+  // Lego Mindstorms EV3
+  @DefaultMessage("Ev3Commands")
+  @Description("")
+  String ev3CommandsComponentPallette();
+
+  @DefaultMessage("Ev3UI")
+  @Description("")
+  String ev3UIComponentPallette();
+
+  @DefaultMessage("Ev3Sound")
+  @Description("")
+  String ev3SoundComponentPallette();
+
+  @DefaultMessage("Ev3Motors")
+  @Description("")
+  String ev3MotorsComponentPallette();
+
+  @DefaultMessage("Ev3TouchSensor")
+  @Description("")
+  String ev3TouchSensorComponentPallette();
+
+  @DefaultMessage("Ev3ColorSensor")
+  @Description("")
+  String ev3ColorSensorComponentPallette();
+
+  @DefaultMessage("Ev3GyroSensor")
+  @Description("")
+  String ev3GyroSensorComponentPallette();
+
+  @DefaultMessage("Ev3UltrasonicSensor")
+  @Description("")
+  String ev3UltrasonicSensorComponentPallette();
 
   // Storage
   @DefaultMessage("ActivityStarter")
@@ -2363,6 +2610,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String fileComponentPallette();
 
+  @DefaultMessage("FirebaseDB")
+  @Description("")
+  String firebaseDBComponentPallette();
+
   @DefaultMessage("FusiontablesControl")
   @Description("")
   String fusiontablesControlComponentPallette();
@@ -2370,6 +2621,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("GameClient")
   @Description("")
   String gameClientComponentPallette();
+
+  @DefaultMessage("password")
+  @Description("")
+  String passwordParams();
 
   @DefaultMessage("SoundRecorder")
   @Description("")
@@ -2656,6 +2911,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String PhoneNumberProperties();
 
+  @DefaultMessage("PhoneNumber")
+  @Description("")
+  String phoneNumberParams();
+
   @DefaultMessage("PhoneNumberList")
   @Description("")
   String PhoneNumberListProperties();
@@ -2739,6 +2998,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("FirebaseURL")
   @Description("")
   String FirebaseURLProperties();
+
+  @DefaultMessage("Persist")
+  @Description("")
+  String PersistProperties();
 
   @DefaultMessage("ProjectBucket")
   @Description("")
@@ -2852,9 +3115,17 @@ public interface OdeMessages extends Messages {
   @Description("")
   String VersionNameProperties();
 
+  @DefaultMessage("TutorialURL")
+  @Description("")
+  String TutorialURLProperties();
+
   @DefaultMessage("Sizing")
   @Description("")
   String SizingProperties();
+
+  @DefaultMessage("ShowListsAsJson")
+  @Description("")
+  String ShowListsAsJsonProperties();
 
   @DefaultMessage("Visible")
   @Description("")
@@ -3007,6 +3278,14 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("ElapsedTime")
   @Description("")
   String ElapsedTimeProperties();
+
+  @DefaultMessage("SimpleSteps")
+  @Description("")
+  String SimpleStepsProperties();
+
+  @DefaultMessage("WalkSteps")
+  @Description("")
+  String WalkStepsProperties();
 
   @DefaultMessage("Moving")
   @Description("")
@@ -3256,6 +3535,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String UsernameProperties();
 
+  @DefaultMessage("username")
+  @Description("")
+  String usernameParams();
+
   @DefaultMessage("XAccel")
   @Description("")
   String XAccelProperties();
@@ -3292,6 +3575,34 @@ public interface OdeMessages extends Messages {
   @Description("")
   String WebViewStringProperties();
 
+  @DefaultMessage("EnableSpeedRegulation")
+  @Description("")
+  String EnableSpeedRegulationProperties();
+
+  @DefaultMessage("Mode")
+  @Description("")
+  String ModeProperties();
+
+  @DefaultMessage("MotorPorts")
+  @Description("")
+  String MotorPortsProperties();
+
+  @DefaultMessage("ReverseDirection")
+  @Description("")
+  String ReverseDirectionProperties();
+
+  @DefaultMessage("SensorValueChangedEventEnabled")
+  @Description("")
+  String SensorValueChangedEventEnabledProperties();
+
+  @DefaultMessage("TachoCountChangedEventEnabled")
+  @Description("")
+  String TachoCountChangedEventEnabledProperties();
+
+  @DefaultMessage("Unit")
+  @Description("")
+  String UnitProperties();
+
   //Params
   @DefaultMessage("xAccel")
   @Description("")
@@ -3308,6 +3619,22 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("result")
   @Description("")
   String resultParams();
+
+  @DefaultMessage("tableId")
+  @Description("")
+  String tableIdParams();
+
+  @DefaultMessage("columns")
+  @Description("")
+  String columnsParams();
+
+  @DefaultMessage("conditions")
+  @Description("")
+  String conditionsParams();
+
+  @DefaultMessage("values")
+  @Description("")
+  String valuesParams();
 
   @DefaultMessage("other")
   @Description("")
@@ -3469,6 +3796,26 @@ public interface OdeMessages extends Messages {
   @Description("")
   String colorParams();
 
+  @DefaultMessage("year")
+  @Description("")
+  String yearParams();
+
+  @DefaultMessage("month")
+  @Description("")
+  String monthParams();
+
+  @DefaultMessage("day")
+  @Description("")
+  String dayParams();
+
+  @DefaultMessage("hour")
+  @Description("")
+  String hourParams();
+
+  @DefaultMessage("minute")
+  @Description("")
+  String minuteParams();
+
   @DefaultMessage("instant")
   @Description("")
   String instantParams();
@@ -3505,6 +3852,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String durationParams();
 
+  @DefaultMessage("pattern")
+  @Description("")
+  String patternParams();
+
   @DefaultMessage("years")
   @Description("")
   String yearsParams();
@@ -3532,6 +3883,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("message")
   @Description("")
   String messageParams();
+
+  @DefaultMessage("mediafileParams")
+  @Description("")
+  String mediafileParams();
 
   @DefaultMessage("otherScreenName")
   @Description("")
@@ -3761,9 +4116,17 @@ public interface OdeMessages extends Messages {
   @Description("")
   String tagParams();
 
+  @DefaultMessage("value")
+  @Description("")
+  String valueParams();
+
   @DefaultMessage("valueToStore")
   @Description("")
   String valueToStoreParams();
+
+  @DefaultMessage("valueToAdd")
+  @Description("")
+  String valueToAddParams();
 
   @DefaultMessage("tagFromWebDB")
   @Description("")
@@ -3825,6 +4188,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String encodingParams();
 
+  @DefaultMessage("xmlText")
+  @Description("")
+  String xmlTextParams();
+
   @DefaultMessage("name")
   @Description("")
   String nameParams();
@@ -3877,9 +4244,9 @@ public interface OdeMessages extends Messages {
   @Description("")
   String queryParams();
 
-  @DefaultMessage("ImagePath")
+  @DefaultMessage("imagePath")
   @Description("")
-  String ImagePathParams();
+  String imagePathParams();
 
   @DefaultMessage("ms")
   @Description("")
@@ -3912,6 +4279,58 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("timestamp")
   @Description("")
   String timestampParams();
+
+  @DefaultMessage("colorCode")
+  @Description("")
+  String colorCodeParams();
+
+  @DefaultMessage("colorName")
+  @Description("")
+  String colorNameParams();
+
+  @DefaultMessage("fill")
+  @Description("")
+  String fillParams();
+
+  @DefaultMessage("frequency")
+  @Description("")
+  String frequencyParams();
+
+  @DefaultMessage("height")
+  @Description("")
+  String heightParams();
+
+  @DefaultMessage("no")
+  @Description("")
+  String noParams();
+
+  @DefaultMessage("rate")
+  @Description("")
+  String rateParams();
+
+  @DefaultMessage("sensorValue")
+  @Description("")
+  String sensorValueParams();
+
+  @DefaultMessage("tachoCount")
+  @Description("")
+  String tachoCountParams();
+
+  @DefaultMessage("tachoCounts")
+  @Description("")
+  String tachoCountsParams();
+
+  @DefaultMessage("useBrake")
+  @Description("")
+  String useBrakeParams();
+
+  @DefaultMessage("volume")
+  @Description("")
+  String volumeParams();
+
+  @DefaultMessage("width")
+  @Description("")
+  String widthParams();
 
   //Events
   @DefaultMessage("AccelerationChanged")
@@ -4210,6 +4629,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String GotValueEvents();
 
+  @DefaultMessage("TagList")
+  @Description("")
+  String TagListEvents();
+
   @DefaultMessage("ValueStored")
   @Description("")
   String ValueStoredEvents();
@@ -4301,6 +4724,14 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("GyroscopeChanged")
   @Description("")
   String GyroscopeChangedEvents();
+
+  @DefaultMessage("TachoCountChanged")
+  @Description("")
+  String TachoCountChangedEvents();
+
+  @DefaultMessage("SensorValueChanged")
+  @Description("")
+  String SensorValueChangedEvents();
 
   //Methods
   @DefaultMessage("ResolveActivity")
@@ -4915,6 +5346,22 @@ public interface OdeMessages extends Messages {
   @Description("")
   String StoreValueMethods();
 
+  @DefaultMessage("GetTagList")
+  @Description("")
+  String GetTagListMethods();
+
+  @DefaultMessage("AppendValue")
+  @Description("")
+  String AppendValueMethods();
+
+  @DefaultMessage("RemoveFirst")
+  @Description("")
+  String RemoveFirstMethods();
+
+  @DefaultMessage("FirstRemoved")
+  @Description("")
+  String FirstRemovedEvents();
+
   @DefaultMessage("InitializeValue")
   @Description("")
   String InitializeValueMethods();
@@ -5009,7 +5456,7 @@ public interface OdeMessages extends Messages {
 
   @DefaultMessage("XmlTextDecode")
   @Description("")
-  String XmlTextDecodeMethods();
+  String xmlTextDecodeMethods();
 
   @DefaultMessage("PostFile")
   @Description("")
@@ -5159,6 +5606,133 @@ public interface OdeMessages extends Messages {
   @Description("")
   String RequestTranslationMethods();
 
+  @DefaultMessage("GetBatteryCurrent")
+  @Description("")
+  String GetBatteryCurrentMethods();
+
+  @DefaultMessage("GetBatteryVoltage")
+  @Description("")
+  String GetBatteryVoltageMethods();
+
+  @DefaultMessage("GetHardwareVersion")
+  @Description("")
+  String GetHardwareVersionMethods();
+
+  @DefaultMessage("SetAngleMode")
+  @Description("")
+  String SetAngleModeMethods();
+
+  @DefaultMessage("SetRateMode")
+  @Description("")
+  String SetRateModeMethods();
+
+  @DefaultMessage("SetCmUnit")
+  @Description("")
+  String SetCmUnitMethods();
+
+  @DefaultMessage("SetInchUnit")
+  @Description("")
+  String SetInchUnitMethods();
+
+  @DefaultMessage("SetColorMode")
+  @Description("")
+  String SetColorModeMethods();
+
+  @DefaultMessage("SetReflectedMode")
+  @Description("")
+  String SetReflectedModeMethods();
+
+  @DefaultMessage("SetAmbientMode")
+  @Description("")
+  String SetAmbientModeMethods();
+
+  @DefaultMessage("RotateIndefinitely")
+  @Description("")
+  String RotateIndefinitelyMethods();
+
+  @DefaultMessage("RotateInDistance")
+  @Description("")
+  String RotateInDistanceMethods();
+
+  @DefaultMessage("RotateInDuration")
+  @Description("")
+  String RotateInDurationMethods();
+
+  @DefaultMessage("RotateInTachoCounts")
+  @Description("")
+  String RotateInTachoCountsMethods();
+
+  @DefaultMessage("RotateSyncIndefinitely")
+  @Description("")
+  String RotateSyncIndefinitelyMethods();
+
+  @DefaultMessage("RotateSyncInDistance")
+  @Description("")
+  String RotateSyncInDistanceMethods();
+
+  @DefaultMessage("RotateSyncInDuration")
+  @Description("")
+  String RotateSyncInDurationMethods();
+
+  @DefaultMessage("RotateSyncInTachoCounts")
+  @Description("")
+  String RotateSyncInTachoCountsMethods();
+
+  @DefaultMessage("ToggleDirection")
+  @Description("")
+  String ToggleDirectionMethods();
+
+  @DefaultMessage("GetTachoCount")
+  @Description("")
+  String GetTachoCountMethods();
+
+  @DefaultMessage("ResetTachoCount")
+  @Description("")
+  String ResetTachoCountMethods();
+
+  @DefaultMessage("GetSensorValue")
+  @Description("")
+  String GetSensorValueMethods();
+
+  @DefaultMessage("GetColorCode")
+  @Description("")
+  String GetColorCodeMethods();
+
+  @DefaultMessage("GetColorName")
+  @Description("")
+  String GetColorNameMethods();
+
+  @DefaultMessage("FillScreen")
+  @Description("")
+  String FillScreenMethods();
+
+  @DefaultMessage("DrawRect")
+  @Description("")
+  String DrawRectMethods();
+
+  @DefaultMessage("DrawIcon")
+  @Description("")
+  String DrawIconMethods();
+
+  @DefaultMessage("GetOSVersion")
+  @Description("")
+  String GetOSVersionMethods();
+
+  @DefaultMessage("GetOSBuild")
+  @Description("")
+  String GetOSBuildMethods();
+
+  @DefaultMessage("GetFirmwareBuild")
+  @Description("")
+  String GetFirmwareBuildMethods();
+
+  @DefaultMessage("SetPower")
+  @Description("")
+  String SetPowerMethods();
+
+  @DefaultMessage("StopSound")
+  @Description("")
+  String StopSoundMethods();
 
   //Mock Components
   @DefaultMessage("add items...")
@@ -5166,7 +5740,7 @@ public interface OdeMessages extends Messages {
   String MockSpinnerAddItems();
 
   //help strings
-  @DefaultMessage("Non-visible component that can detect shaking and measure acceleration approximately in three dimensions using SI units (m/s<sup>2</sup>).  The components are: <ul>\n<li> <strong>xAccel</strong>: 0 when the phone is at rest on a flat      surface, positive when the phone is tilted to the right (i.e.,      its left side is raised), and negative when the phone is tilted      to the left (i.e., its right size is raised).</li>\n <li> <strong>yAccel</strong>: 0 when the phone is at rest on a flat      surface, positive when its bottom is raised, and negative when      its top is raised. </li>\n <li> <strong>zAccel</strong>: Equal to -9.8 (earth\"s gravity in meters per      second per second when the device is at rest parallel to the ground      with the display facing up,      0 when perpindicular to the ground, and +9.8 when facing down.       The value can also be affected by accelerating it with or against      gravity. </li></ul>")
+  @DefaultMessage("Non-visible component that can detect shaking and measure acceleration approximately in three dimensions using SI units (m/s<sup>2</sup>).  The components are: <ul>\n<li> <strong>xAccel</strong>: 0 when the phone is at rest on a flat      surface, positive when the phone is tilted to the right (i.e.,      its left side is raised), and negative when the phone is tilted      to the left (i.e., its right size is raised).</li>\n <li> <strong>yAccel</strong>: 0 when the phone is at rest on a flat      surface, positive when its bottom is raised, and negative when      its top is raised. </li>\n <li> <strong>zAccel</strong>: Equal to -9.8 (earth\"s gravity in meters per      second per second when the device is at rest parallel to the ground      with the display facing up,      0 when perpendicular to the ground, and +9.8 when facing down.       The value can also be affected by accelerating it with or against      gravity. </li></ul>")
   @Description("")
   String AccelerometerSensorHelpStringComponentPallette();
 
@@ -5237,6 +5811,38 @@ public interface OdeMessages extends Messages {
   @Description("")
   String EmailPickerHelpStringComponentPallette();
 
+  @DefaultMessage("A component that provides both high- and low-level interfaces to control the motors on LEGO MINDSTORMS EV3.")
+  @Description("")
+  String Ev3MotorsHelpStringComponentPallette();
+
+  @DefaultMessage("A component that provides a high-level interface to a touch sensor on a LEGO MINDSTORMS EV3 robot.")
+  @Description("")
+  String Ev3TouchSensorHelpStringComponentPallette();
+
+  @DefaultMessage("A component that provides a high-level interface to a gyro sensor on a LEGO MINDSTORMS EV3 robot.")
+  @Description("")
+  String Ev3GyroSensorHelpStringComponentPallette();
+
+  @DefaultMessage("A component that provides a high-level interface to a color sensor on a LEGO MINDSTORMS EV3 robot.")
+  @Description("")
+  String Ev3ColorSensorHelpStringComponentPallette();
+
+  @DefaultMessage("A component that provides a high-level interface to an ultrasonic sensor on a LEGO MINDSTORMS EV3 robot.")
+  @Description("")
+  String Ev3UltrasonicSensorHelpStringComponentPallette();
+
+  @DefaultMessage("A component that provides a low-level interface to a LEGO MINDSTORMS EV3 robot, with functions to send system or direct commands to EV3 robots.")
+  @Description("")
+  String Ev3CommandsHelpStringComponentPallette();
+
+  @DefaultMessage("A component that provides a high-level interface to a LEGO MINDSTORMS EV3 robot, which provides graphic functionalities.")
+  @Description("")
+  String Ev3UIHelpStringComponentPallette();
+
+  @DefaultMessage("A component that provides a high-level interface to sound functionalities on LEGO MINDSTORMS EV3 robot.")
+  @Description("")
+  String Ev3SoundHelpStringComponentPallette();
+
   @DefaultMessage("Non-visible component for storing and retrieving files. Use this component to write or read files on your device. The default behaviour is to write files to the private data directory associated with your App. The Companion is special cased to write files to /sdcard/AppInventor/data to facilitate debugging. If the file path starts with a slash (/), then the file is created relative to /sdcard. For example writing a file to /myFile.txt will write the file in /sdcard/myFile.txt.")
   @Description("")
   String FileHelpStringComponentPallette();
@@ -5245,7 +5851,7 @@ public interface OdeMessages extends Messages {
   @Description("")
   String FormHelpStringComponentPallette();
 
-  @DefaultMessage("<p>A non-visible component that communicates with Google Fusion Tables.  Fusion Tables let you store, share, query and visualize data tables; this component lets you query, create, and modify these tables.</p> <p>This component uses the <a href=\"https://developers.google.com/fusiontables/docs/v1/getting_started\" target=\"_blank\">Fusion Tables API V1.0</a>.  <p>Applications using Fusion Tables must authentication to Google\"s servers. There are two ways this can be done. The first way uses an API Key which you the developer obtain (see below). With this approach end-users must also login to access a Fusion Table.  The second approach is to use a Service Account. With this approach you create credentials and a special \"Service Account Email Address\" which you obtain from the <a href=\"https://code.google.com/apis/console/\" target=\"_blank\">Google APIs Console</a>.  You then tell the Fusion Table Control the name of the Service Account Email address and upload the secret key as an asset to your application and set the KeyFile property to point at this file. Finally you check the \"UseServiceAuthentication\" checkbox in the designer.  When using a Service Account, end-users do not need to login to use Fusion Tables, your service account authenticates all access.</p> <p>To get an API key, follow these instructions.</p> <ol> <li>Go to your <a href=\"https://code.google.com/apis/console/\" target=\"_blank\">Google APIs Console</a> and login if necessary.</li> <li>Select the <i>Services</i> item from the menu on the left.</li> <li>Choose the <i>Fusiontables</i> service from the list provided and turn it on.</li> <li>Go back to the main menu and select the <i>API Access</i> item. </li> </ol> <p>Your API Key will be near the bottom of that pane in the section called \"Simple API Access\".  You will have to provide that key as the value for the <i>ApiKey</i> property in your Fusiontables app.</p> <p>Once you have an API key, set the value of the <i>Query</i> property to a valid Fusiontables SQL query and call <i>SendQuery</i> to execute the query.  App Inventor will send the query to the Fusion Tables server and the <i>GotResult</i> block will fire when a result is returned from the server.  Query results will be returned in CSV format, and can be converted to list format using the \"list from csv table\" or \"list from csv row\" blocks.</p> <p>Note that you do not need to worry about UTF-encoding the query.  But you do need to make sure the query follows the syntax described in <a href=\"https://developers.google.com/fusiontables/docs/v1/getting_started\" target=\"_blank\">the reference manual</a>, which means that things like capitalization for names of columns matters, and that single quotes must be used around column names if there are spaces in them.</p>")
+  @DefaultMessage("<p>A non-visible component that communicates with Google Fusion Tables.  Fusion Tables let you store, share, query and visualize data tables; this component lets you query, create, and modify these tables.</p> <p>This component uses the <a href=\"https://developers.google.com/fusiontables/docs/v2/getting_started\" target=\"_blank\">Fusion Tables API V2.0</a>.  <p>Applications using Fusion Tables must authentication to Google\"s servers. There are two ways this can be done. The first way uses an API Key which you the developer obtain (see below). With this approach end-users must also login to access a Fusion Table.  The second approach is to use a Service Account. With this approach you create credentials and a special \"Service Account Email Address\" which you obtain from the <a href=\"https://code.google.com/apis/console/\" target=\"_blank\">Google APIs Console</a>.  You then tell the Fusion Table Control the name of the Service Account Email address and upload the secret key as an asset to your application and set the KeyFile property to point at this file. Finally you check the \"UseServiceAuthentication\" checkbox in the designer.  When using a Service Account, end-users do not need to login to use Fusion Tables, your service account authenticates all access.</p> <p>To get an API key, follow these instructions.</p> <ol> <li>Go to your <a href=\"https://code.google.com/apis/console/\" target=\"_blank\">Google APIs Console</a> and login if necessary.</li> <li>Select the <i>Services</i> item from the menu on the left.</li> <li>Choose the <i>Fusiontables</i> service from the list provided and turn it on.</li> <li>Go back to the main menu and select the <i>API Access</i> item. </li> </ol> <p>Your API Key will be near the bottom of that pane in the section called \"Simple API Access\".  You will have to provide that key as the value for the <i>ApiKey</i> property in your Fusiontables app.</p> <p>Once you have an API key, set the value of the <i>Query</i> property to a valid Fusiontables SQL query and call <i>SendQuery</i> to execute the query.  App Inventor will send the query to the Fusion Tables server and the <i>GotResult</i> block will fire when a result is returned from the server.  Query results will be returned in CSV format, and can be converted to list format using the \"list from csv table\" or \"list from csv row\" blocks.</p> <p>Note that you do not need to worry about UTF-encoding the query.  But you do need to make sure the query follows the syntax described in <a href=\"https://developers.google.com/fusiontables/docs/v2/getting_started\" target=\"_blank\">the reference manual</a>, which means that things like capitalization for names of columns matters, and that single quotes must be used around column names if there are spaces in them.</p>")
   @Description("")
   String FusiontablesControlHelpStringComponentPallette();
 
@@ -5260,6 +5866,10 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("<p>A formatting element in which to place components that should be displayed from left to right.  If you wish to have components displayed one over another, use <code>VerticalArrangement</code> instead.</p>")
   @Description("")
   String HorizontalArrangementHelpStringComponentPallette();
+
+  @DefaultMessage("<p>A formatting element in which to place components that should be displayed from left to right.  If you wish to have components displayed one over another, use <code>VerticalArrangement</code> instead.</p><p>This version is scrollable.,")
+  @Description("")
+  String HorizontalScrollArrangementHelpStringComponentPallette();
 
   @DefaultMessage("Component for displaying images.  The picture to display, and other aspects of the Image\"s appearance, can be specified in the Designer or in the Blocks Editor.")
   @Description("")
@@ -5285,9 +5895,13 @@ public interface OdeMessages extends Messages {
   @Description("")
   String ListViewHelpStringComponentPallette();
 
-  @DefaultMessage("Non-visible component providing location information, including longitude, latitude, altitude (if supported by the device), and address.  This can also perform \"geocoding\", converting a given address (not necessarily the current one) to a latitude (with the <code>LatitudeFromAddress</code> method) and a longitude (with the <code>LongitudeFromAddress</code> method).</p>\n<p>In order to function, the component must have its <code>Enabled</code> property set to True, and the device must have location sensing enabled through wireless networks or GPS satellites (if outdoors).</p>\nLocation information might not be immediately available when an app starts.  You\"ll have to wait a short time for a location provider to be found and used, or wait for the OnLocationChanged event")
+  @DefaultMessage("Non-visible component providing location information, including longitude, latitude, altitude (if supported by the device), speed (if supported by the device), and address.  This can also perform \"geocoding\", converting a given address (not necessarily the current one) to a latitude (with the <code>LatitudeFromAddress</code> method) and a longitude (with the <code>LongitudeFromAddress</code> method).</p>\n <p>In order to function, the component must have its <code>Enabled</code> property set to True, and the device must have location sensing enabled through wireless networks or GPS satellites (if outdoors).</p>\nLocation information might not be immediately available when an app starts.  You''ll have to wait a short time for a location provider to be found and used, or wait for the OnLocationChanged event")
   @Description("")
   String LocationSensorHelpStringComponentPallette();
+
+  @DefaultMessage("<p>The MediaStore component communicates with a web service to store media objects. This component has a single method that stores a media object in the services blob store, and returns a pointer to the object via a url.</p>")
+  @Description("")
+  String MediaStoreHelpStringComponentPallette();
 
   @DefaultMessage("<p>Non-visible component to provide NFC capabilities.  For now this component supports the reading and writing of text tags only (if supported by the device)</p><p>In order to read and write text tags, the component must have its <code>ReadMode</code> property set to True or False respectively.</p><p><strong>Note:</strong> This component will only work on Screen1 of any App Inventor app.</p>")
   @Description("")
@@ -5333,7 +5947,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String PasswordTextBoxHelpStringComponentPallette();
 
-  @DefaultMessage("Component that can count steps.")
+  @DefaultMessage("A Component that acts like a Pedometer. It senses motion via the " +
+    "Accerleromter and attempts to determine if a step has been " +
+    "taken. Using a configurable stride length, it can estimate the " +
+    "distance traveled as well. ")
   @Description("")
   String PedometerHelpStringComponentPallette();
 
@@ -5418,6 +6035,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String VerticalArrangementHelpStringComponentPallette();
 
+  @DefaultMessage("<p>A formatting element in which to place components that should be displayed one below another.  (The first child component is stored on top, the second beneath it, etc.)  If you wish to have components displayed next to one another, use <code>HorizontalArrangement</code> instead.</p><p> This version is scrollable.</p>")
+  @Description("")
+  String VerticalScrollArrangementHelpStringComponentPallette();
+
   @DefaultMessage("A multimedia component capable of playing videos. When the application is run, the VideoPlayer will be displayed as a rectangle on-screen.  If the user touches the rectangle, controls will appear to play/pause, skip ahead, and skip backward within the video.  The application can also control behavior by calling the <code>Start</code>, <code>Pause</code>, and <code>SeekTo</code> methods.  <p>Video files should be in Windows Media Video (.wmv) format, 3GPP (.3gp), or MPEG-4 (.mp4).  For more details about legal formats, see <a href=\"http://developer.android.com/guide/appendix/media-formats.html\" target=\"_blank\">Android Supported Media Formats</a>.</p><p>App Inventor for Android only permits video files under 1 MB and limits the total size of an application to 5 MB, not all of which is available for media (video, audio, and sound) files.  If your media files are too large, you may get errors when packaging or installing your application, in which case you should reduce the number of media files or their sizes.  Most video editing software, such as Windows Movie Maker and Apple iMovie, can help you decrease the size of videos by shortening them or re-encoding the video into a more compact format.</p><p>You can also set the media source to a URL that points to a streaming video, but the URL must point to the video file itself, not to a program that plays the video.")
   @Description("")
   String VideoPlayerHelpStringComponentPallette();
@@ -5466,10 +6087,6 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("Welcome to App Inventor!")
   @Description("")
   String createWelcomeDialogText();
-
-  @DefaultMessage("<h2>This is the Splash Screen. Make this an iframe to your splash screen.</h2>")
-  @Description("")
-  String createWelcomeDialogMessage();
 
   @DefaultMessage("Continue")
   @Description("")
@@ -5645,6 +6262,10 @@ public interface OdeMessages extends Messages {
   @Description("")
   String switchToPortugueseBR();
 
+  @DefaultMessage("Nederlands")
+  @Description("")
+  String switchToDutch();
+
   @DefaultMessage("Progress Bar")
   @Description("")
   String ProgressBarFor();
@@ -5799,5 +6420,15 @@ public interface OdeMessages extends Messages {
   @DefaultMessage("You are in Read Only Mode")
   @Description("")
   String readOnlyMode();
+
+  @DefaultMessage("Either your session has expired, or App Inventor has been upgraded. " +
+    "You will need to \"Reload\" your session to continue. Press the \"Reload\" Button " +
+    "below.")
+  @Description("")
+  String sessionDead();
+
+  @DefaultMessage("Reload")
+  @Description("")
+  String reloadWindow();
 
 }

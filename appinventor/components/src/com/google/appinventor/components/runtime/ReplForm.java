@@ -5,35 +5,30 @@
 // http://www.apache.org/licenses/LICENSE-2.0
 package com.google.appinventor.components.runtime;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
+import android.content.Context;
+import android.os.Looper;
 import com.google.appinventor.components.runtime.util.AppInvHTTPD;
+import com.google.appinventor.components.runtime.util.ErrorMessages;
 import com.google.appinventor.components.runtime.util.RetValManager;
-import com.google.appinventor.components.runtime.util.SdkLevel;
-import com.google.appinventor.components.runtime.util.EclairUtil;
 
-import android.content.ComponentName;
+import dalvik.system.DexClassLoader;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.Toast;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Activity;
-import android.content.Context;
 
 /**
  * Subclass of Form used by the 'stem cell apk', i.e. the Android app that allows communication
@@ -46,12 +41,16 @@ public class ReplForm extends Form {
 
   private AppInvHTTPD httpdServer = null;
   public static ReplForm topform;
-  private static final String REPL_ASSET_DIR = "/sdcard/AppInventor/assets/";
+  private static final String REPL_ASSET_DIR =
+    Environment.getExternalStorageDirectory().getAbsolutePath() +
+    "/AppInventor/assets/";
+  private static final String REPL_COMP_DIR = REPL_ASSET_DIR + "external_comps/";
   private boolean IsUSBRepl = false;
   private boolean assetsLoaded = false;
   private boolean isDirect = false; // True for USB and emulator (AI2)
   private Object replResult = null; // Return result when closing screen in Repl
   private String replResultFormName = null;
+  private List<String> loadedExternalDexs; // keep a track of loaded dexs to prevent reloading and causing crash in older APIs
 
   public ReplForm() {
     super();
@@ -62,6 +61,7 @@ public class ReplForm extends Form {
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
     Log.d("ReplForm", "onCreate");
+    loadedExternalDexs = new ArrayList<String>();
     Intent intent = getIntent();
     processExtras(intent, false);
   }
@@ -234,6 +234,13 @@ public class ReplForm extends Form {
         f.mkdirs();             // Create the directory and all parents
   }
 
+  private boolean checkComponentDir() {
+    File f = new File(REPL_COMP_DIR);
+    if (!f.exists())
+      return f.mkdirs();
+    return true;
+  }
+
   // We return true if the assets for the Companion have been loaded and
   // displayed so we should look for all future assets in the sdcard which
   // is where assets are placed for the companion.
@@ -245,6 +252,48 @@ public class ReplForm extends Form {
 
   public void setAssetsLoaded() {
     assetsLoaded = true;
+  }
+
+  /**
+   * This is a nasty hack. For loading external component's dex file so that they can be accessible for
+   * kawa to load it, when required. This assumes classloader checks class via delegation through the parent
+   * classloaders. For multiple dex files, we just cascade the classloaders in the hierarchy
+   */
+  public void loadComponents(List<String> extensionNames) {
+    Set<String> extensions = new HashSet<String>(extensionNames);
+    // Store the loaded dex files in the private storage of the App for stable optimization
+    File dexOutput = activeForm.$context().getDir("componentDexs", Context.MODE_PRIVATE);
+    File componentFolder = new File(REPL_COMP_DIR );
+    if (!checkComponentDir()) {
+      Log.d("ReplForm", "Unable to create components directory");
+      dispatchErrorOccurredEventDialog(this, "loadComponents", ErrorMessages.ERROR_EXTENSION_ERROR,
+          1, "App Inventor", "Unable to create component directory.");
+      return;
+    }
+    // Current Thread Class Loader
+    ClassLoader parentClassLoader = ReplForm.class.getClassLoader();
+    StringBuilder sb = new StringBuilder();
+    loadedExternalDexs.clear();
+    for (File compFolder : componentFolder.listFiles()) {
+      if (compFolder.isDirectory()) {
+        if (!extensions.contains(compFolder.getName())) continue;  // Skip extensions on the phone but not required by the project
+        File component = new File(compFolder.getPath() + File.separator + "classes.jar");
+        File loadComponent = new File(compFolder.getPath() + File.separator + compFolder.getName() + ".jar");
+        component.renameTo(loadComponent);
+        if (loadComponent.exists() && !loadedExternalDexs.contains(loadComponent.getName())) {
+          Log.d("ReplForm", "Loading component dex " + loadComponent.getAbsolutePath());
+          loadedExternalDexs.add(loadComponent.getName());
+          sb.append(File.pathSeparatorChar);
+          sb.append(loadComponent.getAbsolutePath());
+        }
+      }
+    }
+    DexClassLoader dexCloader = new DexClassLoader(sb.substring(1), dexOutput.getAbsolutePath(),
+        null, parentClassLoader);
+    Thread.currentThread().setContextClassLoader(dexCloader);
+    Log.d("ReplForm", Thread.currentThread().toString());
+    Log.d("ReplForm", Looper.getMainLooper().getThread().toString());
+    Looper.getMainLooper().getThread().setContextClassLoader(dexCloader);
   }
 
   private String genReportId() {
@@ -510,5 +559,4 @@ public class ReplForm extends Form {
     int v = random.nextInt(256);
     return words[r] + " " + words[v];
   }
-
 }

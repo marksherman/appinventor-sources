@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2012 MIT, All rights reserved
+// Copyright 2011-2017 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -9,12 +9,13 @@ package com.google.appinventor.client.editor.simple.components;
 import static com.google.appinventor.client.Ode.MESSAGES;
 
 import com.google.appinventor.client.editor.simple.SimpleComponentDatabase;
-
+import com.google.appinventor.client.ComponentsTranslation;
 import com.google.appinventor.client.Images;
 import com.google.appinventor.client.Ode;
-import com.google.appinventor.client.TranslationDesignerPallete;
 import com.google.appinventor.client.editor.simple.SimpleEditor;
+import com.google.appinventor.client.editor.simple.components.utils.PropertiesUtil;
 import com.google.appinventor.client.editor.youngandroid.YaBlocksEditor;
+import com.google.appinventor.client.editor.youngandroid.YaFormEditor;
 import com.google.appinventor.client.explorer.SourceStructureExplorerItem;
 import com.google.appinventor.client.explorer.project.Project;
 import com.google.appinventor.client.output.OdeLog;
@@ -34,6 +35,7 @@ import com.google.appinventor.shared.rpc.project.ProjectNode;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidAssetsFolder;
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidProjectNode;
 import com.google.appinventor.shared.settings.SettingsConstants;
+import com.google.appinventor.shared.simple.ComponentDatabaseInterface;
 import com.google.appinventor.shared.storage.StorageUtil;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -59,6 +61,8 @@ import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.impl.ClippedImagePrototype;
+import com.google.appinventor.shared.simple.ComponentDatabaseInterface.ComponentDefinition;
+import com.google.appinventor.shared.simple.ComponentDatabaseInterface.PropertyDefinition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,9 +82,8 @@ import java.util.Map;
 public abstract class MockComponent extends Composite implements PropertyChangeListener,
     SourcesMouseEvents, DragSource {
   // Common property names (not all components support all properties).
-  protected static final String PROPERTY_NAME_NAME = "Name";
-  protected static final String PROPERTY_NAME_UUID = "Uuid";
-  protected static final String PROPERTY_NAME_SOURCE = "Source";
+  public static final String PROPERTY_NAME_NAME = "Name";
+  public static final String PROPERTY_NAME_UUID = "Uuid";
   protected static final List<String> YAIL_NAMES = Arrays.asList("CsvUtil", "Double", "Float",
     "Integer", "JavaCollection", "JavaIterator", "KawaEnvironment", "Long", "Short",
     "SimpleForm", "String", "Pattern", "YailList", "YailNumberToString", "YailRuntimeError");
@@ -209,6 +212,9 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     }
   }
 
+  // Component database: information about components (including their properties and events)
+  private final SimpleComponentDatabase COMPONENT_DATABASE;
+
   // Image bundle
   protected static final Images images = Ode.getImageBundle();
 
@@ -220,7 +226,8 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   protected final SimpleEditor editor;
 
   private final String type;
-  private final Image iconImage;
+  private ComponentDefinition componentDefinition;
+  private Image iconImage;
 
   private final SourceStructureExplorerItem sourceStructureExplorerItem;
   /**
@@ -250,6 +257,8 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     this.editor = editor;
     this.type = type;
     this.iconImage = iconImage;
+    COMPONENT_DATABASE = SimpleComponentDatabase.getInstance(editor.getProjectId());
+    componentDefinition = COMPONENT_DATABASE.getComponentDefinition(type);
 
     sourceStructureExplorerItem = new SourceStructureExplorerItem() {
       @Override
@@ -294,14 +303,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
       public void delete() {
         if (!isForm()) {
           if (Window.confirm(MESSAGES.reallyDeleteComponent())) {
-            MockComponent.this.editor.getProjectEditor().clearLocation(MockComponent.this.getName());
-            getForm().select();
-            // Pass true to indicate that the component is being permanently deleted.
-            getContainer().removeComponent(MockComponent.this, true);
-            // tell the component its been removed, so it can remove children's blocks
-            MockComponent.this.onRemoved();
-            properties.removePropertyChangeListener(MockComponent.this);
-            properties.clear();
+            MockComponent.this.delete();
           }
         }
       }
@@ -390,7 +392,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
    * Returns a unique default component name.
    */
   private String componentName() {
-    String compType = TranslationDesignerPallete.getCorrespondingString(getType());
+    String compType = ComponentsTranslation.getComponentName(getType());
     compType = compType.replace(" ", "_").replace("'", "_"); // Make sure it doesn't have any spaces in it
     return compType + getNextComponentIndex();
   }
@@ -413,7 +415,7 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   private int getNextComponentIndex() {
     int highIndex = 0;
     if (editor != null) {
-      final String typeName = TranslationDesignerPallete.getCorrespondingString(getType())
+      final String typeName = ComponentsTranslation.getComponentName(getType())
         .toLowerCase()
         .replace(" ", "_")
         .replace("'", "_");
@@ -683,10 +685,8 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     // Note: We create a ClippedImagePrototype because we need something that can be
     // used to get HTML for the iconImage. AbstractImagePrototype requires
     // an ImageResource, which we don't necessarily have.
-    String imageHTML = new ClippedImagePrototype(iconImage.getUrl(), iconImage.getOriginLeft(),
-        iconImage.getOriginTop(), ICON_IMAGE_WIDTH, ICON_IMAGE_HEIGHT).getHTML();
     TreeItem itemNode = new TreeItem(
-        new HTML("<span>" + imageHTML + getName() + "</span>"));
+        new HTML("<span>" + iconImage.getElement().getString() + getName() + "</span>"));
     itemNode.setUserObject(sourceStructureExplorerItem);
     return itemNode;
   }
@@ -922,12 +922,27 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
    * Refreshes the form.
    *
    * <p>This method should be called whenever a property that affects the size
-   * of the component is changed.
+   * of the component is changed. It calls refreshForm(false) which permits
+   * throttling.
    */
   final void refreshForm() {
+    refreshForm(false);
+  }
+
+  /*
+   * Refresh the current form. If force is true, we bypass the
+   * throttling code. This is needed by MockImageBase because it
+   * *must* refresh the form before resizing loaded images.
+   *
+   */
+  final void refreshForm(boolean force) {
     if (isAttached()) {
       if (getContainer() != null || isForm()) {
-        getForm().refresh();
+        if (force) {
+          getForm().doRefresh();
+        } else {
+          getForm().refresh();
+        }
       }
     }
   }
@@ -956,6 +971,18 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
 
   }
 
+  public void delete() {
+    OdeLog.log("Got delete component for " + this.getName());
+    this.editor.getProjectEditor().clearLocation(getName());
+    getForm().select();
+    // Pass true to indicate that the component is being permanently deleted.
+    getContainer().removeComponent(this, true);
+    // tell the component its been removed, so it can remove children's blocks
+    onRemoved();
+    properties.removePropertyChangeListener(this);
+    properties.clear();
+  }
+
   // Layout
 
   LayoutInfo createLayoutInfo(Map<MockComponent, LayoutInfo> layoutInfoMap) {
@@ -971,4 +998,86 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
       }
     };
   }
+
+  /** Upgrading MockComponent
+   *
+   * When extensions are upgraded, the MockComponents might need to undergo changes.
+   * These changes can be produced inside this function.
+   * All subclasses overriding this method must call super.upgrade()!
+   */
+  public void upgrade() {
+    //Upgrade Icon
+
+    //We copy all compatible properties values
+    List<PropertyDefinition> newProperties = COMPONENT_DATABASE.getPropertyDefinitions(this.type);
+    List<PropertyDefinition> oldProperties = componentDefinition.getProperties();
+    EditableProperties currentProperties = getProperties();
+    //Operations
+    List<String> toBeRemoved = new ArrayList<String>();
+    List<String> toBeAdded = new ArrayList<String>();
+    //Plan operations
+    for (EditableProperty property : currentProperties) {
+      boolean presentInNewProperties = false;
+      boolean presentInOldProperties = false;
+      String oldType = "";
+      String newType = "";
+      for (PropertyDefinition prop : newProperties) {
+        if (prop.getName() == property.getName()) {
+          presentInNewProperties = true;
+          newType = prop.getEditorType();
+        }
+      }
+      for (PropertyDefinition prop : oldProperties) {
+        if (prop.getName() == property.getName()) {
+          presentInOldProperties = true;
+          oldType = prop.getEditorType();
+        }
+      }
+      // deprecated property
+      if (!presentInNewProperties && presentInOldProperties) {
+        toBeRemoved.add(property.getName());
+      }
+      // new property, less likely to happen here
+      else if (presentInNewProperties && !presentInOldProperties) {
+        toBeAdded.add(property.getName());
+      }
+      // existing property
+      else if (presentInNewProperties && presentInOldProperties) {
+        if (newType != oldType) { // type change detected
+          toBeRemoved.add(property.getName());
+          toBeAdded.add(property.getName());
+        }
+      }
+    }
+    //New property
+    for (PropertyDefinition property : newProperties) {
+      if (!toBeAdded.contains(property.getName()) && !currentProperties.hasProperty(property.getName())) {
+        toBeAdded.add(property.getName());
+      }
+    }
+    //Execute operations
+    for (String prop : toBeRemoved) {
+      currentProperties.removeProperty(prop);
+    }
+    for (PropertyDefinition property : newProperties) {
+      if (toBeAdded.contains(property.getName())) {
+        PropertyEditor propertyEditor = PropertiesUtil.createPropertyEditor(property.getEditorType(), (YaFormEditor) editor);
+        addProperty(property.getName(), property.getDefaultValue(), property.getCaption(), propertyEditor);
+      }
+    }
+
+  }
+
+  /**
+   * upgradeComplete()
+   * Mark a MockComponent upgrade complete.
+   * This MUST be called manually after calling upgrade()!
+   * All subclasses overriding this method must call super.upgradeComplete()!
+   */
+  public void upgradeComplete() {
+    this.componentDefinition = COMPONENT_DATABASE.getComponentDefinition(this.type); //Update ComponentDefinition
+  }
+
+
+
 }

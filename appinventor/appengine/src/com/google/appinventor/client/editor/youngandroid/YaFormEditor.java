@@ -1,6 +1,6 @@
 // -*- mode: java; c-basic-offset: 2; -*-
 // Copyright 2009-2011 Google, All Rights reserved
-// Copyright 2011-2012 MIT, All rights reserved
+// Copyright 2011-2017 MIT, All rights reserved
 // Released under the Apache License, Version 2.0
 // http://www.apache.org/licenses/LICENSE-2.0
 
@@ -8,6 +8,7 @@ package com.google.appinventor.client.editor.youngandroid;
 
 import static com.google.appinventor.client.Ode.MESSAGES;
 
+import com.google.appinventor.client.ErrorReporter;
 import com.google.appinventor.client.Ode;
 import com.google.appinventor.client.OdeAsyncCallback;
 import com.google.appinventor.client.boxes.AssetListBox;
@@ -15,6 +16,7 @@ import com.google.appinventor.client.boxes.PaletteBox;
 import com.google.appinventor.client.boxes.PropertiesBox;
 import com.google.appinventor.client.boxes.SourceStructureBox;
 import com.google.appinventor.client.editor.ProjectEditor;
+import com.google.appinventor.client.editor.simple.ComponentNotFoundException;
 import com.google.appinventor.client.editor.simple.SimpleComponentDatabase;
 import com.google.appinventor.client.editor.simple.SimpleEditor;
 import com.google.appinventor.client.editor.simple.SimpleNonVisibleComponentsPanel;
@@ -28,6 +30,7 @@ import com.google.appinventor.client.editor.simple.palette.SimpleComponentDescri
 import com.google.appinventor.client.editor.simple.palette.SimplePalettePanel;
 import com.google.appinventor.client.editor.youngandroid.palette.YoungAndroidPalettePanel;
 import com.google.appinventor.client.explorer.SourceStructureExplorer;
+import com.google.appinventor.client.explorer.project.ComponentDatabaseChangeListener;
 import com.google.appinventor.client.output.OdeLog;
 import com.google.appinventor.client.properties.json.ClientJsonParser;
 import com.google.appinventor.client.properties.json.ClientJsonString;
@@ -46,11 +49,13 @@ import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidFormNo
 import com.google.appinventor.shared.youngandroid.YoungAndroidSourceAnalyzer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DockPanel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +68,7 @@ import java.util.Map;
  * @author markf@google.com (Mark Friedman)
  * @author lizlooney@google.com (Liz Looney)
  */
-public final class YaFormEditor extends SimpleEditor implements FormChangeListener {
+public final class YaFormEditor extends SimpleEditor implements FormChangeListener, ComponentDatabaseChangeListener {
 
   private static class FileContentHolder {
     private String content;
@@ -81,11 +86,13 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
     }
   }
 
+  private static final String ERROR_EXISTING_UUID = "Component with UUID \"%1$s\" already exists.";
+  private static final String ERROR_NONEXISTENT_UUID = "No component exists with UUID \"%1$s\".";
+
   // JSON parser
   private static final JSONParser JSON_PARSER = new ClientJsonParser();
 
-  private static final SimpleComponentDatabase COMPONENT_DATABASE =
-      SimpleComponentDatabase.getInstance();
+  private final SimpleComponentDatabase COMPONENT_DATABASE;
 
   private final YoungAndroidFormNode formNode;
 
@@ -115,7 +122,13 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
   // and we rely on the pre-upgraded .scm file for this info.
   private String preUpgradeJsonString;
 
+  private final List<ComponentDatabaseChangeListener> componentDatabaseChangeListeners = new ArrayList<ComponentDatabaseChangeListener>();
   private JSONArray authURL;    // List of App Inventor versions we have been edited on.
+
+  /**
+   * A mapping of component UUIDs to mock components in the designer view.
+   */
+  private final Map<String, MockComponent> componentsDb = new HashMap<String, MockComponent>();
 
   private static final int OLD_PROJECT_YAV = 150; // Projects older then this have no authURL
 
@@ -129,6 +142,7 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
     super(projectEditor, formNode);
 
     this.formNode = formNode;
+    COMPONENT_DATABASE = SimpleComponentDatabase.getInstance(getProjectId());
 
     // Get reference to the source structure explorer
     sourceStructureExplorer =
@@ -136,7 +150,9 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
 
     // Create UI elements for the designer panels.
     nonVisibleComponentsPanel = new SimpleNonVisibleComponentsPanel();
+    componentDatabaseChangeListeners.add(nonVisibleComponentsPanel);
     visibleComponentsPanel = new SimpleVisibleComponentsPanel(this, nonVisibleComponentsPanel);
+    componentDatabaseChangeListeners.add(visibleComponentsPanel);
     DockPanel componentsPanel = new DockPanel();
     componentsPanel.setHorizontalAlignment(DockPanel.ALIGN_CENTER);
     componentsPanel.add(visibleComponentsPanel, DockPanel.NORTH);
@@ -158,11 +174,11 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
       }
     });
     palettePanel.setSize("100%", "100%");
+    componentDatabaseChangeListeners.add(palettePanel);
 
     // Create designProperties, which will be used as the content of the PropertiesBox.
     designProperties = new PropertiesPanel();
     designProperties.setSize("100%", "100%");
-
     initWidget(componentsPanel);
     setSize("100%", "100%");
   }
@@ -187,7 +203,11 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
         upgradeFile(fileContentHolder, new Command() {
           @Override
           public void execute() {
-            onFileLoaded(fileContentHolder.getFileContent());
+            try {
+              onFileLoaded(fileContentHolder.getFileContent());
+            } catch(IllegalArgumentException e) {
+              return;
+            }
             if (afterFileLoaded != null) {
               afterFileLoaded.execute();
             }
@@ -478,7 +498,15 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
   private void onFileLoaded(String content) {
     JSONObject propertiesObject = YoungAndroidSourceAnalyzer.parseSourceFile(
         content, JSON_PARSER);
-    form = createMockForm(propertiesObject.getProperties().get("Properties").asObject());
+    try {
+      form = createMockForm(propertiesObject.getProperties().get("Properties").asObject());
+    } catch(ComponentNotFoundException e) {
+      Ode.getInstance().recordCorruptProject(getProjectId(), getProjectRootNode().getName(),
+          e.getMessage());
+      ErrorReporter.reportError(MESSAGES.noComponentFound(e.getComponentName(),
+          getProjectRootNode().getName()));
+      throw e;
+    }
 
     // Initialize the nonVisibleComponentsPanel and visibleComponentsPanel.
     nonVisibleComponentsPanel.setForm(form);
@@ -515,7 +543,8 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
       // Instantiate new root component
       mockComponent = new MockForm(this);
     } else {
-      mockComponent = SimpleComponentDescriptor.createMockComponent(componentType, this);
+      mockComponent = SimpleComponentDescriptor.createMockComponent(componentType,
+          COMPONENT_DATABASE.getComponentType(componentType), this);
 
       // Add the component to its parent component (and if it is non-visible, add it to the
       // nonVisibleComponent panel).
@@ -561,6 +590,13 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
     }
 
     return mockComponent;
+  }
+
+  @Override
+  public void getBlocksImage(Callback<String, String> callback) {
+    YaProjectEditor yaProjectEditor = (YaProjectEditor) projectEditor;
+    YaBlocksEditor blockEditor = yaProjectEditor.getBlocksFileEditor(formNode.getFormName());
+    blockEditor.getBlocksImage(callback);
   }
 
   /*
@@ -717,13 +753,71 @@ public final class YaFormEditor extends SimpleEditor implements FormChangeListen
     propertiesBox.setVisible(false);
   }
 
+  /**
+   * Runs through all the Mock Components and upgrades if its corresponding Component was Upgraded
+   * @param componentTypes the Component Types that got upgraded
+   */
+  private void updateMockComponents(List<String> componentTypes) {
+    Map<String, MockComponent> componentMap = getComponents();
+    for (MockComponent mockComponent : componentMap.values()) {
+      if (componentTypes.contains(mockComponent.getType())) {
+        mockComponent.upgrade();
+        mockComponent.upgradeComplete();
+      }
+    }
+  }
+
   /*
    * Push changes to a connected phone (or emulator).
    */
   private void updatePhone() {
     YaProjectEditor yaProjectEditor = (YaProjectEditor) projectEditor;
     YaBlocksEditor blockEditor = yaProjectEditor.getBlocksFileEditor(formNode.getFormName());
-    blockEditor.onBlocksAreaChanged(getProjectId() + "_" + formNode.getFormName());
+    blockEditor.sendComponentData();
   }
 
+  @Override
+  public void onComponentTypeAdded(List<String> componentTypes) {
+    COMPONENT_DATABASE.removeComponentDatabaseListener(this);
+    for (ComponentDatabaseChangeListener cdbChangeListener : componentDatabaseChangeListeners) {
+      cdbChangeListener.onComponentTypeAdded(componentTypes);
+    }
+    //Update Mock Components
+    updateMockComponents(componentTypes);
+    //Update the Properties Panel
+    updatePropertiesPanel(form.getSelectedComponent());
+  }
+
+  @Override
+  public boolean beforeComponentTypeRemoved(List<String> componentTypes) {
+    boolean result = true;
+    for (ComponentDatabaseChangeListener cdbChangeListener : componentDatabaseChangeListeners) {
+      result = result & cdbChangeListener.beforeComponentTypeRemoved(componentTypes);
+    }
+    List<MockComponent> mockComponents = new ArrayList<MockComponent>(getForm().getChildren());
+    for (String compType : componentTypes) {
+      for (MockComponent mockComp : mockComponents) {
+        if (mockComp.getType().equals(compType)) {
+          mockComp.delete();
+        }
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public void onComponentTypeRemoved(Map<String, String> componentTypes) {
+    COMPONENT_DATABASE.removeComponentDatabaseListener(this);
+    for (ComponentDatabaseChangeListener cdbChangeListener : componentDatabaseChangeListeners) {
+      cdbChangeListener.onComponentTypeRemoved(componentTypes);
+    }
+  }
+
+  @Override
+  public void onResetDatabase() {
+    COMPONENT_DATABASE.removeComponentDatabaseListener(this);
+    for (ComponentDatabaseChangeListener cdbChangeListener : componentDatabaseChangeListeners) {
+      cdbChangeListener.onResetDatabase();
+    }
+  }
 }

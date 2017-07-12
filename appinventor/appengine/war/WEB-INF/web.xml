@@ -18,6 +18,7 @@
        explicitly list all the ones we do want, which seems
        error-prone.
     -->
+  <!-- App Stats Disabled
   <filter>
     <filter-name>appstats</filter-name>
     <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
@@ -30,7 +31,7 @@
     <filter-name>appstats</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-
+-->
 
   <!-- Security constraints: require login for these urls -->
   <!-- This is how we implement Google Account login -->
@@ -250,31 +251,6 @@
     <servlet-name>userInfoService</servlet-name>
   </filter-mapping>
 
-  <!-- webstartfile
-       Note: this servlet does not require user authentication -->
-  <servlet>
-    <servlet-name>webStartFileServlet</servlet-name>
-    <servlet-class>com.google.appinventor.server.WebStartFileServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>webStartFileServlet</servlet-name>
-    <url-pattern>/ode2/webstartfile/*</url-pattern>
-  </servlet-mapping>
-
-  <!-- webstartjnlp -->
-  <servlet>
-    <servlet-name>webStartJnlpServlet</servlet-name>
-    <servlet-class>com.google.appinventor.server.WebStartJnlpServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>webStartJnlpServlet</servlet-name>
-    <url-pattern>/ode/webstartjnlp/*</url-pattern>
-  </servlet-mapping>
-  <filter-mapping>
-    <filter-name>odeAuthFilter</filter-name>
-    <servlet-name>webStartJnlpServlet</servlet-name>
-  </filter-mapping>
-
   <!-- android -->
   <servlet>
     <servlet-name>androidServlet</servlet-name>
@@ -282,25 +258,11 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>androidServlet</servlet-name>
-    <url-pattern>/ode/android/*</url-pattern>
+    <url-pattern>/android/*</url-pattern>
   </servlet-mapping>
   <filter-mapping>
     <filter-name>odeAuthFilter</filter-name>
     <servlet-name>androidServlet</servlet-name>
-  </filter-mapping>
-
-  <!-- launch rpc service -->
-  <servlet>
-    <servlet-name>launchService</servlet-name>
-    <servlet-class>com.google.appinventor.server.LaunchServiceImpl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>launchService</servlet-name>
-    <url-pattern>/ode/launch</url-pattern>
-  </servlet-mapping>
-  <filter-mapping>
-    <filter-name>odeAuthFilter</filter-name>
-    <servlet-name>launchService</servlet-name>
   </filter-mapping>
 
   <!-- accept tos -->
@@ -399,5 +361,19 @@
     <servlet-name>appstats</servlet-name>
     <url-pattern>/appstats/*</url-pattern>
   </servlet-mapping>
+
+  <!-- components -->
+  <servlet>
+    <servlet-name>componentService</servlet-name>
+    <servlet-class>com.google.appinventor.server.ComponentServiceImpl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>componentService</servlet-name>
+    <url-pattern>/ode/components</url-pattern>
+  </servlet-mapping>
+  <filter-mapping>
+    <filter-name>odeAuthFilter</filter-name>
+    <servlet-name>componentService</servlet-name>
+  </filter-mapping>
 
 </web-app>

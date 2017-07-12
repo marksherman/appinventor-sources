@@ -57,8 +57,8 @@ Blockly.Snapshot.send = function(eventType) {
 		projectId: top.BlocklyPanel_getProjectId(),
 		screenName: top.BlocklyPanel_getScreenName(),
 		sessionId: top.BlocklyPanel_getSessionId(),
-    yaversion: top.BlocklyPanel_getYaVersion(),
-    languageVersion: top.BlocklyPanel_getBlocksLanguageVersion(),
+    yaversion: top.YA_VERSION,
+    languageVersion: top.BLOCKS_VERSION,
     eventType: eventType,
     blocks: Blockly.SaveFile.get(),
     form: top.ReplState.phoneState.formJson

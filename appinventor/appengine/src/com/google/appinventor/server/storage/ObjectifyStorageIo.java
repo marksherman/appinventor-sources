@@ -23,6 +23,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.apphosting.api.ApiProxy;
 import com.google.appinventor.server.CrashReport;
 import com.google.appinventor.server.FileExporter;
+import com.google.appinventor.server.Server;
 import com.google.appinventor.server.flags.Flag;
 import com.google.appinventor.server.storage.StoredData.CorruptionRecord;
 import com.google.appinventor.server.storage.StoredData.FeedbackData;
@@ -54,6 +55,7 @@ import com.google.appinventor.shared.storage.StorageUtil;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
 
@@ -62,6 +64,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Query;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 // GCS imports
@@ -80,9 +83,11 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.Channels;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -92,6 +97,8 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
+
+import org.json.JSONObject;
 
 /**
  * Implements the StorageIo interface using Objectify as the underlying data
@@ -124,6 +131,7 @@ public class ObjectifyStorageIo implements  StorageIo {
   private final boolean useGcs = Flag.createFlag("use.gcs", true).get();
 
   private final boolean conversionEnabled = false; // We are converting GCS <=> Blobstore
+  private static final boolean DEBUG = Flag.createFlag("appinventor.debugging", false).get();
 
   // Use this class to define the work of a job that can be
   // retried. The "datastore" argument to run() is the Objectify
@@ -146,7 +154,8 @@ public class ObjectifyStorageIo implements  StorageIo {
 
   @VisibleForTesting
   abstract class JobRetryHelper {
-    public abstract void run(Objectify datastore) throws ObjectifyException;
+    private IOException exception = null;
+    public abstract void run(Objectify datastore) throws ObjectifyException, IOException;
     /*
      * Called before retrying the job. Note that the underlying datastore
      * still has the transaction active, so restrictions about operations
@@ -154,6 +163,12 @@ public class ObjectifyStorageIo implements  StorageIo {
      */
     public void onNonFatalError() {
       // Default is to do nothing
+    }
+    public void onIOException(IOException error) {
+      exception = error;
+    }
+    public IOException getIOException() {
+      return exception;
     }
   }
 
@@ -205,12 +220,14 @@ public class ObjectifyStorageIo implements  StorageIo {
     RetryParams retryParams = new RetryParams.Builder().initialRetryDelayMillis(100)
       .retryMaxAttempts(10)
       .totalRetryPeriodMillis(10000).build();
-    LOG.log(Level.INFO, "RetryParams: getInitialRetryDelayMillis() = " + retryParams.getInitialRetryDelayMillis());
-    LOG.log(Level.INFO, "RetryParams: getRequestTimeoutMillis() = " + retryParams.getRequestTimeoutMillis());
-    LOG.log(Level.INFO, "RetryParams: getRetryDelayBackoffFactor() = " + retryParams.getRetryDelayBackoffFactor());
-    LOG.log(Level.INFO, "RetryParams: getRetryMaxAttempts() = " + retryParams.getRetryMaxAttempts());
-    LOG.log(Level.INFO, "RetryParams: getRetryMinAttempts() = " + retryParams.getRetryMinAttempts());
-    LOG.log(Level.INFO, "RetryParams: getTotalRetryPeriodMillis() = " + retryParams.getTotalRetryPeriodMillis());
+    if (DEBUG) {
+      LOG.log(Level.INFO, "RetryParams: getInitialRetryDelayMillis() = " + retryParams.getInitialRetryDelayMillis());
+      LOG.log(Level.INFO, "RetryParams: getRequestTimeoutMillis() = " + retryParams.getRequestTimeoutMillis());
+      LOG.log(Level.INFO, "RetryParams: getRetryDelayBackoffFactor() = " + retryParams.getRetryDelayBackoffFactor());
+      LOG.log(Level.INFO, "RetryParams: getRetryMaxAttempts() = " + retryParams.getRetryMaxAttempts());
+      LOG.log(Level.INFO, "RetryParams: getRetryMinAttempts() = " + retryParams.getRetryMinAttempts());
+      LOG.log(Level.INFO, "RetryParams: getTotalRetryPeriodMillis() = " + retryParams.getTotalRetryPeriodMillis());
+    }
     gcsService = GcsServiceFactory.createGcsService(retryParams);
     memcache.setErrorHandler(ErrorHandlers.getConsistentLogAndContinue(Level.INFO));
     initMotd();
@@ -668,7 +685,15 @@ public class ObjectifyStorageIo implements  StorageIo {
         public void onNonFatalError() {
         }
 
-      }, true);
+      }, Server.isProductionServer()); // Only use a transaction on the production server
+                                       // The App Engine dev server simulates the Google Cloud
+                                       // Store using the datastore. If we use a transaction
+                                       // here we wind up covering more then one entity group
+                                       // (Our access to FileData and Fake-GCS access to its own
+                                       // datastore kind to simulate GCS) which is an error.
+                                       // We can use a transaction in production between the
+                                       // production implementation of GCS does not touch the
+                                       // datastore
 
       // second job is on the user entity
       runJobWithRetries(new JobRetryHelper() {
@@ -934,6 +959,41 @@ public class ObjectifyStorageIo implements  StorageIo {
   }
 
   @Override
+  public List<UserProject> getUserProjects(final String userId, final List<Long> projectIds) {
+    final Result<Map<Long,ProjectData>> projectDatas = new Result<Map<Long,ProjectData>>();
+    try {
+      runJobWithRetries(new JobRetryHelper() {
+        @Override
+        public void run(Objectify datastore) {
+          Map<Long,ProjectData> pd = datastore.get(ProjectData.class, projectIds);
+          if (pd != null) {
+            projectDatas.t = pd;
+          } else {
+            projectDatas.t = null;
+          }
+        }
+      }, false);
+    } catch (ObjectifyException e) {
+      throw CrashReport.createAndLogError(LOG, null,
+        collectUserErrorInfo(userId), e);
+    }
+    if (projectDatas.t == null) {
+      throw new RuntimeException("getUserProjects wants to return null, userId = " + userId);
+      // Note we directly throw a RuntimeException instead of calling CrashReport
+      // because we don't have an explicitly caught exception to hand it.
+    } else {
+      List<UserProject> uProjects = Lists.newArrayListWithExpectedSize(projectDatas.t.size());
+      for (ProjectData projectData : projectDatas.t.values()) {
+        uProjects.add(new UserProject(projectData.id, projectData.name,
+            projectData.type, projectData.dateCreated,
+            projectData.dateModified, projectData.galleryId,
+            projectData.attributionId));
+      }
+      return uProjects;
+    }
+  }
+
+  @Override
   public String getProjectName(final String userId, final long projectId) {
     final Result<String> projectName = new Result<String>();
     try {
@@ -1166,12 +1226,35 @@ public class ObjectifyStorageIo implements  StorageIo {
   }
 
   /*
-   * We expect the UserFileData object for the given userId and fileName to
-   * already exist in the datastore. Find the object and update its contents.
+   * We look for the UserFileData object for the given userId and fileName.
+   * If it doesn't exit, we create it.
+   *
+   * SPECIAL CASE: If fileName == StorageUtil.USER_BACKBACK_FILENAME and the
+   * content is "[]", we *delete* the file because the default value returned
+   * if the file doesn't exist is "[]" (the JSON empty list). This is to reduce
+   * the clutter of files for the case where someone doesn't have anything in
+   * the backpack. We pay $$ for storage.
+   *
    */
   private void addUserFileContents(Objectify datastore, String userId, String fileName, byte[] content) {
     UserFileData ufd = datastore.find(userFileKey(userKey(userId), fileName));
-    Preconditions.checkState(ufd != null);
+    byte [] empty = new byte[] { (byte)0x5b, (byte)0x5d }; // "[]" in bytes
+    if (ufd == null) {          // File doesn't exist
+      if (fileName.equals(StorageUtil.USER_BACKPACK_FILENAME) &&
+        Arrays.equals(empty, content)) {
+        return;                 // Nothing to do
+      }
+      ufd = new UserFileData();
+      ufd.fileName = fileName;
+      ufd.userKey = userKey(userId);
+    } else {
+      if (fileName.equals(StorageUtil.USER_BACKPACK_FILENAME) &&
+        Arrays.equals(empty, content)) {
+        // Storing an empty backback, just delete the file
+        datastore.delete(userFileKey(userKey(userId), fileName));
+        return;
+      }
+    }
     ufd.content = content;
     datastore.put(ufd);
   }
@@ -1494,12 +1577,14 @@ public class ObjectifyStorageIo implements  StorageIo {
           if (fd == null) {
             fd = datastore.find(projectFileKey(projectKey(projectId), fileName));
           } else {
-            LOG.log(Level.INFO, "Fetched " + key.getString() + " from memcache.");
+            if (DEBUG) {
+              LOG.log(Level.INFO, "Fetched " + key.getString() + " from memcache.");
+            }
           }
 
           // <Screen>.yail files are missing when user converts AI1 project to AI2
           // instead of blowing up, just create a <Screen>.yail file
-          if (fd == null && fileName.endsWith(".yail")){
+          if (fd == null && (fileName.endsWith(".yail") || (fileName.endsWith(".png")))){
             fd = createProjectFile(datastore, projectKey(projectId), FileData.RoleEnum.SOURCE, fileName);
             fd.userId = userId;
           }
@@ -1774,7 +1859,9 @@ public class ObjectifyStorageIo implements  StorageIo {
                 while (bytesRead < fileSize) {
                   bytesRead += readChannel.read(resultBuffer);
                   if (bytesRead < fileSize) {
-                    LOG.log(Level.INFO, "readChannel: bytesRead = " + bytesRead + " fileSize = " + fileSize);
+                    if (DEBUG) {
+                      LOG.log(Level.INFO, "readChannel: bytesRead = " + bytesRead + " fileSize = " + fileSize);
+                    }
                   }
                 }
                 recovered = true;
@@ -1890,16 +1977,21 @@ public class ObjectifyStorageIo implements  StorageIo {
    * @param includeProjectHistory  whether or not to include the project history
    * @param includeAndroidKeystore  whether or not to include the Android keystore
    * @param zipName  the name of the zip file, if a specific one is desired
-
+   * @param includeYail include any yail files in the project
+   * @param includeScreenShots include any screen shots stored with the project
+   * @param fatalError Signal a fatal error if a file is not found
+   * @param forGallery flag to indicate we are exporting for the gallery
    * @return  project with the content as requested by params.
    */
   @Override
   public ProjectSourceZip exportProjectSourceZip(final String userId, final long projectId,
-                                                 final boolean includeProjectHistory,
-                                                 final boolean includeAndroidKeystore,
-                                                 @Nullable String zipName,
-                                                 final boolean includeYail,
-                                                 final boolean fatalError) throws IOException {
+    final boolean includeProjectHistory,
+    final boolean includeAndroidKeystore,
+    @Nullable String zipName,
+    final boolean includeYail,
+    final boolean includeScreenShots,
+    final boolean forGallery,
+    final boolean fatalError) throws IOException {
     validateGCS();
     final Result<Integer> fileCount = new Result<Integer>();
     fileCount.t = 0;
@@ -1919,16 +2011,23 @@ public class ObjectifyStorageIo implements  StorageIo {
     out.setComment("Built with MIT App Inventor");
 
     try {
-      runJobWithRetries(new JobRetryHelper() {
+      JobRetryHelper job = new JobRetryHelper() {
         @Override
-        public void run(Objectify datastore) {
+        public void run(Objectify datastore) throws IOException {
           Key<ProjectData> projectKey = projectKey(projectId);
           boolean foundFiles = false;
           for (FileData fd : datastore.query(FileData.class).ancestor(projectKey)) {
             String fileName = fd.fileName;
+            if (fileName.startsWith("assets/external_comps") && forGallery) {
+              throw new IOException("FATAL Error, external component in gallery app");
+            }
             if (fd.role.equals(FileData.RoleEnum.SOURCE)) {
               if (fileName.equals(FileExporter.REMIX_INFORMATION_FILE_PATH)) {
                 // Skip legacy remix history files that were previous stored with the project
+                continue;
+              }
+              if (fileName.startsWith("screenshots") && !includeScreenShots) {
+                // Only include screenshots if asked...
                 continue;
               }
               if (fileName.endsWith(".yail") && !includeYail) {
@@ -1953,8 +2052,12 @@ public class ObjectifyStorageIo implements  StorageIo {
             }
           }
         }
-      }, false);
-
+      };
+      runJobWithRetries(job, true);
+      IOException error = job.getIOException();
+      if (error != null) {
+        throw error;
+      }
       // Process the file contents outside of the job since we can't read
       // blobs in the job.
       for (FileData fd : fileData) {
@@ -1988,7 +2091,9 @@ public class ObjectifyStorageIo implements  StorageIo {
                   while (bytesRead < fileSize) {
                     bytesRead += readChannel.read(resultBuffer);
                     if (bytesRead < fileSize) {
-                      LOG.log(Level.INFO, "readChannel: bytesRead = " + bytesRead + " fileSize = " + fileSize);
+                      if (DEBUG) {
+                        LOG.log(Level.INFO, "readChannel: bytesRead = " + bytesRead + " fileSize = " + fileSize);
+                      }
                     }
                   }
                   recovered = true;
@@ -2434,6 +2539,9 @@ public class ObjectifyStorageIo implements  StorageIo {
         // maybe this should be a fatal error? I think only thing
         // that creates this exception is this method.
         job.onNonFatalError();
+      } catch (IOException e) {
+        job.onIOException(e);
+        break;
       } finally {
         if (useTransaction && datastore.getTxn().isActive()) {
           try {
@@ -2467,6 +2575,42 @@ public class ObjectifyStorageIo implements  StorageIo {
     return "user=" + userId + ", project=" + projectId;
   }
 
+  @Override
+  public String uploadTempFile(byte[] content) throws IOException {
+    String uuid = UUID.randomUUID().toString();
+    String fileName = "__TEMP__/" + uuid;
+    setGcsFileContent(fileName, content);
+    return fileName;
+  }
+
+  @Override
+  public InputStream openTempFile(String fileName) throws IOException {
+    if (!fileName.startsWith("__TEMP__")) {
+      throw new RuntimeException("deleteTempFile (" + fileName + ") Invalid File Name");
+    }
+    GcsFilename gcsFileName = new GcsFilename(GCS_BUCKET_NAME, fileName);
+    int fileSize = (int) gcsService.getMetadata(gcsFileName).getLength();
+    ByteBuffer resultBuffer = ByteBuffer.allocate(fileSize);
+    GcsInputChannel readChannel = gcsService.openReadChannel(gcsFileName, 0);
+    int bytesRead = 0;
+    try {
+      while (bytesRead < fileSize) {
+        bytesRead += readChannel.read(resultBuffer);
+      }
+    } finally {
+      readChannel.close();
+    }
+    return new ByteArrayInputStream(resultBuffer.array());
+  }
+
+  @Override
+  public void deleteTempFile(String fileName) throws IOException {
+    if (!fileName.startsWith("__TEMP__")) {
+      throw new RuntimeException("deleteTempFile (" + fileName + ") Invalid File Name");
+    }
+    gcsService.delete(new GcsFilename(GCS_BUCKET_NAME, fileName));
+  }
+
   // ********* METHODS BELOW ARE ONLY FOR TESTING *********
 
   @VisibleForTesting
@@ -2498,6 +2642,15 @@ public class ObjectifyStorageIo implements  StorageIo {
   @VisibleForTesting
   ProjectData getProject(long projectId) {
     return ObjectifyService.begin().find(projectKey(projectId));
+  }
+
+  @VisibleForTesting
+  void setGcsFileContent(String gcsPath, byte[] content) throws IOException {
+    GcsOutputChannel outputChannel = gcsService.createOrReplace(
+        new GcsFilename(GCS_BUCKET_NAME, gcsPath),
+        GcsFileOptions.getDefaultInstance());
+    outputChannel.write(ByteBuffer.wrap(content));
+    outputChannel.close();
   }
 
   // Return time in ISO_8660 format
