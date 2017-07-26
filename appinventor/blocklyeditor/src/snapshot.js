@@ -57,11 +57,12 @@ Blockly.Snapshot.send = function(eventType) {
 		projectId: top.BlocklyPanel_getProjectId(),
 		screenName: top.BlocklyPanel_getScreenName(),
 		sessionId: top.BlocklyPanel_getSessionId(),
-    yaversion: top.YA_VERSION,
-    languageVersion: top.BLOCKS_VERSION,
-    eventType: eventType,
-    blocks: Blockly.SaveFile.get(),
-    form: top.ReplState.phoneState.formJson
+    	yaversion: top.YA_VERSION,
+    	languageVersion: top.BLOCKS_VERSION,
+    	eventType: eventType,
+    	blocks: Blockly.SaveFile.get(),
+    	form: top.ReplState.phoneState.formJson,
+		sendDate: new Date()
   };
 
 	var data = [
@@ -75,7 +76,7 @@ Blockly.Snapshot.send = function(eventType) {
 		"id": ++idno }    // dirty, i know -Mark
 	);
 
-	console.log("\n\n------ Snapshot! (" + eventType + ")------ " + new Date() + "\n");
+	console.log("\n\n------ Snapshot! (" + eventType + ")------ " + projectData.sendDate + "\n");
 	//console.log("Data:\n");
 	//console.log(content);
 
