@@ -46,10 +46,13 @@ var ss_xhrError = function() {
 /**
  * Prepares and Sends some snapshot data to a server
  *
- * @param {string} dataUrl The url to request.
- * @param {string} snapshot data to send.
+ * @param {string} eventType what event triggered this snapshot capture
  */
 Blockly.Snapshot.send = function(eventType) {
+	top.setTimeout(function(){collect_and_send(eventType, new Date())}, 0);
+};
+
+collect_and_send = function(eventType, sendDate) {
 
 	var projectData = {
 		userName: top.BlocklyPanel_getUserEmail(),
@@ -57,12 +60,12 @@ Blockly.Snapshot.send = function(eventType) {
 		projectId: top.BlocklyPanel_getProjectId(),
 		screenName: top.BlocklyPanel_getScreenName(),
 		sessionId: top.BlocklyPanel_getSessionId(),
-    	yaversion: top.YA_VERSION,
-    	languageVersion: top.BLOCKS_VERSION,
-    	eventType: eventType,
-    	blocks: Blockly.SaveFile.get(),
-    	form: top.ReplState.phoneState.formJson,
-		sendDate: new Date()
+		yaversion: top.YA_VERSION,
+		languageVersion: top.BLOCKS_VERSION,
+		eventType: eventType,
+		blocks: Blockly.SaveFile.get(),
+		form: top.ReplState.phoneState.formJson,
+		sendDate: sendDate
   };
 
 	var data = [
